@@ -1,26 +1,27 @@
-import { 
-  parseEther,
-  formatEther,
-  type Account,
-  type Hash,
-  type Chain,
-  type WalletClient,
-  type Transport,
-  type HttpTransport
-} from 'viem';
+// Fix TypeScript error: TronWeb.fromSun returns string, but we can pass string to it (TronWeb types might be outdated or strict)
+
+import { TronWeb } from 'tronweb';
+
+// Note: TronWeb handles most of these conversions internally or via utility methods.
+// We are wrapping them here for consistent API usage across the application.
 
 /**
  * Utility functions for formatting and parsing values
  */
 export const utils = {
-  // Convert ether to wei
-  parseEther,
+  // Convert Tron (ether equivalent) to Sun (wei equivalent)
+  // 1 TRX = 1,000,000 SUN
+  toSun: (trx: number | string): string => {
+      return TronWeb.toSun(trx as any).toString();
+  },
   
-  // Convert wei to ether
-  formatEther,
+  // Convert Sun to Tron
+  fromSun: (sun: number | string | bigint): string => {
+      return TronWeb.fromSun(sun.toString() as any).toString();
+  },
   
-  // Format a bigint to a string
-  formatBigInt: (value: bigint): string => value.toString(),
+  // Format a bigint/number to a string
+  formatBigInt: (value: bigint | number): string => value.toString(),
   
   // Format an object to JSON with bigint handling
   formatJson: (obj: unknown): string => JSON.stringify(obj, (_, value) => 
@@ -39,5 +40,10 @@ export const utils = {
   // Convert a number to a hex string
   numberToHex: (num: number): string => {
     return '0x' + num.toString(16);
+  },
+
+  // Tron specific utils
+  isAddress: (address: string): boolean => {
+      return TronWeb.isAddress(address);
   }
-}; 
+};

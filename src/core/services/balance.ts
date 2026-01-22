@@ -1,219 +1,66 @@
-import { 
-  formatEther,
-  formatUnits,
-  type Address,
-  type Abi,
-  getContract
-} from 'viem';
-import { getPublicClient } from './clients.js';
-import { readContract } from './contracts.js';
-import { resolveAddress } from './ens.js';
-
-// Standard TRC20 ABI (minimal for reading)
-const trc20Abi = [
-  {
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ type: 'uint8' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [{ type: 'address', name: 'account' }],
-    name: 'balanceOf',
-    outputs: [{ type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
-] as const;
-
-// Standard TRC721 ABI (minimal for reading)
-const trc721Abi = [
-  {
-    inputs: [{ type: 'address', name: 'owner' }],
-    name: 'balanceOf',
-    outputs: [{ type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [{ type: 'uint256', name: 'tokenId' }],
-    name: 'ownerOf',
-    outputs: [{ type: 'address' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
-] as const;
-
-// Standard TRC1155 ABI (minimal for reading)
-const trc1155Abi = [
-  {
-    inputs: [
-      { type: 'address', name: 'account' },
-      { type: 'uint256', name: 'id' }
-    ],
-    name: 'balanceOf',
-    outputs: [{ type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
-] as const;
+import { getTronWeb } from './clients.js';
+import { utils } from './utils.js';
 
 /**
- * Get the TRX balance for an address
- * @param addressOrEns TRON address
- * @param network Network name or chain ID
- * @returns Balance in sun and TRX
+ * Get TRX balance for an address
  */
-export async function getTRXBalance(
-  addressOrEns: string, 
-  network = 'mainnet'
-): Promise<{ wei: bigint; ether: string }> {
-  // Resolve address if needed
-  const address = await resolveAddress(addressOrEns, network);
-  
-  const client = getPublicClient(network);
-  const balance = await client.getBalance({ address });
+export async function getTRXBalance(address: string, network = 'mainnet') {
+  const tronWeb = getTronWeb(network);
+  const balanceSun = await tronWeb.trx.getBalance(address);
   
   return {
-    wei: balance,
-    ether: formatEther(balance)
+    wei: BigInt(balanceSun), // Keeping 'wei' property name for compatibility if tools rely on it, but strictly it's Sun
+    ether: utils.fromSun(balanceSun), // 'ether' -> TRX
+    formatted: utils.fromSun(balanceSun),
+    symbol: 'TRX',
+    decimals: 6
   };
 }
 
 /**
- * Get the balance of a TRC20 token for an address
- * @param tokenAddressOrEns Token contract address
- * @param ownerAddressOrEns Owner address
- * @param network Network name or chain ID
- * @returns Token balance with formatting information
+ * Get TRC20 token balance
  */
-export async function getTRC20Balance(
-  tokenAddressOrEns: string,
-  ownerAddressOrEns: string,
-  network = 'mainnet'
-): Promise<{
-  raw: bigint;
-  formatted: string;
-  token: {
-    symbol: string;
-    decimals: number;
-  }
-}> {
-  // Resolve addresses if needed
-  const tokenAddress = await resolveAddress(tokenAddressOrEns, network);
-  const ownerAddress = await resolveAddress(ownerAddressOrEns, network);
-  
-  const publicClient = getPublicClient(network);
-
-  const contract = getContract({
-    address: tokenAddress,
-    abi: trc20Abi,
-    client: publicClient,
-  });
-
-  const [balance, symbol, decimals] = await Promise.all([
-    contract.read.balanceOf([ownerAddress]),
-    contract.read.symbol(),
-    contract.read.decimals()
-  ]);
-
-  return {
-    raw: balance,
-    formatted: formatUnits(balance, decimals),
-    token: {
-      symbol,
-      decimals
-    }
-  };
-}
-
-/**
- * Check if an address owns a specific NFT
- * @param tokenAddressOrEns NFT contract address
- * @param ownerAddressOrEns Owner address
- * @param tokenId Token ID to check
- * @param network Network name or chain ID
- * @returns True if the address owns the NFT
- */
-export async function isNFTOwner(
-  tokenAddressOrEns: string,
-  ownerAddressOrEns: string,
-  tokenId: bigint,
-  network = 'mainnet'
-): Promise<boolean> {
-  // Resolve addresses if needed
-  const tokenAddress = await resolveAddress(tokenAddressOrEns, network);
-  const ownerAddress = await resolveAddress(ownerAddressOrEns, network);
+export async function getTRC20Balance(tokenAddress: string, walletAddress: string, network = 'mainnet') {
+  const tronWeb = getTronWeb(network);
   
   try {
-    const actualOwner = await readContract({
-      address: tokenAddress,
-      abi: trc721Abi,
-      functionName: 'ownerOf',
-      args: [tokenId]
-    }, network) as Address;
-    
-    return actualOwner.toLowerCase() === ownerAddress.toLowerCase();
+      const contract = await tronWeb.contract().at(tokenAddress);
+      // TRC20 standard functions
+      const balance = await contract.methods.balanceOf(walletAddress).call();
+      const decimals = await contract.methods.decimals().call();
+      const symbol = await contract.methods.symbol().call();
+      
+      const balanceBigInt = BigInt(balance.toString());
+      const divisor = BigInt(10) ** BigInt(decimals.toString());
+      
+      // Basic formatting
+      const formatted = (Number(balanceBigInt) / Number(divisor)).toString();
+      
+      return {
+        raw: balanceBigInt,
+        formatted: formatted,
+        token: {
+            symbol: symbol,
+            decimals: Number(decimals),
+            address: tokenAddress
+        }
+      };
   } catch (error: any) {
-    console.error(`Error checking NFT ownership: ${error.message}`);
-    return false;
+      throw new Error(`Failed to get TRC20 balance: ${error.message}`);
   }
 }
 
 /**
- * Get the number of NFTs owned by an address for a specific collection
- * @param tokenAddressOrEns NFT contract address
- * @param ownerAddressOrEns Owner address
- * @param network Network name or chain ID
- * @returns Number of NFTs owned
+ * Get TRC1155 balance
  */
-export async function getTRC721Balance(
-  tokenAddressOrEns: string,
-  ownerAddressOrEns: string,
-  network = 'mainnet'
-): Promise<bigint> {
-  // Resolve addresses if needed
-  const tokenAddress = await resolveAddress(tokenAddressOrEns, network);
-  const ownerAddress = await resolveAddress(ownerAddressOrEns, network);
-  
-  return readContract({
-    address: tokenAddress,
-    abi: trc721Abi,
-    functionName: 'balanceOf',
-    args: [ownerAddress]
-  }, network) as Promise<bigint>;
+export async function getTRC1155Balance(contractAddress: string, ownerAddress: string, tokenId: bigint, network = 'mainnet') {
+    const tronWeb = getTronWeb(network);
+    
+    try {
+        const contract = await tronWeb.contract().at(contractAddress);
+        const balance = await contract.methods.balanceOf(ownerAddress, tokenId.toString()).call();
+        return BigInt(balance.toString());
+    } catch (error: any) {
+         throw new Error(`Failed to get TRC1155 balance: ${error.message}`);
+    }
 }
-
-/**
- * Get the balance of a TRC1155 token for an address
- * @param tokenAddressOrEns TRC1155 contract address
- * @param ownerAddressOrEns Owner address
- * @param tokenId Token ID to check
- * @param network Network name or chain ID
- * @returns Token balance
- */
-export async function getTRC1155Balance(
-  tokenAddressOrEns: string,
-  ownerAddressOrEns: string,
-  tokenId: bigint,
-  network = 'mainnet'
-): Promise<bigint> {
-  // Resolve addresses if needed
-  const tokenAddress = await resolveAddress(tokenAddressOrEns, network);
-  const ownerAddress = await resolveAddress(ownerAddressOrEns, network);
-  
-  return readContract({
-    address: tokenAddress,
-    abi: trc1155Abi,
-    functionName: 'balanceOf',
-    args: [ownerAddress, tokenId]
-  }, network) as Promise<bigint>;
-} 

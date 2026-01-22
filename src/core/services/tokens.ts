@@ -1,85 +1,11 @@
-import { 
-  type Address, 
-  type Hex,
-  type Hash,
-  formatUnits,
-  getContract
-} from 'viem';
-import { getPublicClient } from './clients.js';
-
-// Standard TRC20 ABI (minimal for reading)
-const trc20Abi = [
-  {
-    inputs: [],
-    name: 'name',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ type: 'uint8' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
-] as const;
-
-// Standard TRC721 ABI (minimal for reading)
-const trc721Abi = [
-  {
-    inputs: [],
-    name: 'name',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [{ type: 'uint256', name: 'tokenId' }],
-    name: 'tokenURI',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
-] as const;
-
-// Standard TRC1155 ABI (minimal for reading)
-const trc1155Abi = [
-  {
-    inputs: [{ type: 'uint256', name: 'id' }],
-    name: 'uri',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
-] as const;
+import { getTronWeb } from './clients.js';
+import { utils } from './utils.js';
 
 /**
  * Get TRC20 token information
  */
 export async function getTRC20TokenInfo(
-  tokenAddress: Address,
+  tokenAddress: string,
   network: string = 'mainnet'
 ): Promise<{
   name: string;
@@ -88,35 +14,43 @@ export async function getTRC20TokenInfo(
   totalSupply: bigint;
   formattedTotalSupply: string;
 }> {
-  const publicClient = getPublicClient(network);
-
-  const contract = getContract({
-    address: tokenAddress,
-    abi: trc20Abi,
-    client: publicClient,
-  });
-
-  const [name, symbol, decimals, totalSupply] = await Promise.all([
-    contract.read.name(),
-    contract.read.symbol(),
-    contract.read.decimals(),
-    contract.read.totalSupply()
-  ]);
-
-  return {
-    name,
-    symbol,
-    decimals,
-    totalSupply,
-    formattedTotalSupply: formatUnits(totalSupply, decimals)
-  };
+  const tronWeb = getTronWeb(network);
+  
+  try {
+      const contract = await tronWeb.contract().at(tokenAddress);
+      
+      const [name, symbol, decimals, totalSupply] = await Promise.all([
+          contract.methods.name().call(),
+          contract.methods.symbol().call(),
+          contract.methods.decimals().call(),
+          contract.methods.totalSupply().call()
+      ]);
+      
+      const decimalsNum = Number(decimals);
+      const totalSupplyBigInt = BigInt(totalSupply.toString());
+      const divisor = BigInt(10) ** BigInt(decimalsNum);
+      
+      // Formatting total supply
+      const formattedTotalSupply = (Number(totalSupplyBigInt) / Number(divisor)).toString();
+      
+      return {
+        name,
+        symbol,
+        decimals: decimalsNum,
+        totalSupply: totalSupplyBigInt,
+        formattedTotalSupply
+      };
+      
+  } catch (error: any) {
+      throw new Error(`Failed to get TRC20 token info: ${error.message}`);
+  }
 }
 
 /**
  * Get TRC721 token metadata
  */
 export async function getTRC721TokenMetadata(
-  tokenAddress: Address,
+  tokenAddress: string,
   tokenId: bigint,
   network: string = 'mainnet'
 ): Promise<{
@@ -124,42 +58,42 @@ export async function getTRC721TokenMetadata(
   symbol: string;
   tokenURI: string;
 }> {
-  const publicClient = getPublicClient(network);
-
-  const contract = getContract({
-    address: tokenAddress,
-    abi: trc721Abi,
-    client: publicClient,
-  });
-
-  const [name, symbol, tokenURI] = await Promise.all([
-    contract.read.name(),
-    contract.read.symbol(),
-    contract.read.tokenURI([tokenId])
-  ]);
-
-  return {
-    name,
-    symbol,
-    tokenURI
-  };
+  const tronWeb = getTronWeb(network);
+  
+  try {
+      const contract = await tronWeb.contract().at(tokenAddress);
+      
+      const [name, symbol, tokenURI] = await Promise.all([
+          contract.methods.name().call(),
+          contract.methods.symbol().call(),
+          contract.methods.tokenURI(tokenId.toString()).call()
+      ]);
+      
+      return {
+        name,
+        symbol,
+        tokenURI
+      };
+  } catch (error: any) {
+      throw new Error(`Failed to get TRC721 metadata: ${error.message}`);
+  }
 }
 
 /**
  * Get TRC1155 token URI
  */
 export async function getTRC1155TokenURI(
-  tokenAddress: Address,
+  tokenAddress: string,
   tokenId: bigint,
   network: string = 'mainnet'
 ): Promise<string> {
-  const publicClient = getPublicClient(network);
-
-  const contract = getContract({
-    address: tokenAddress,
-    abi: trc1155Abi,
-    client: publicClient,
-  });
-
-  return contract.read.uri([tokenId]);
-} 
+  const tronWeb = getTronWeb(network);
+  
+  try {
+      const contract = await tronWeb.contract().at(tokenAddress);
+      const uri = await contract.methods.uri(tokenId.toString()).call();
+      return uri;
+  } catch (error: any) {
+      throw new Error(`Failed to get TRC1155 URI: ${error.message}`);
+  }
+}

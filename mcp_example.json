@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "tron-mcp-server": {
+      "command": "bun",
+      "args": ["run", "src/index.ts"],
+      "env": {
+        "TRON_PRIVATE_KEY": "YOUR_PRIVATE_KEY_HERE"
+      }
+    }
+  }
+}

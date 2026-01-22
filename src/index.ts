@@ -1,3 +1,13 @@
+// Polyfill for protobuf generated code issues in Bun
+// google-protobuf generated code often expects 'proto' to be globally available or implicitly defined
+// especially when using CommonJS/Closure style.
+
+// This file must be imported BEFORE any other imports that might load tronweb
+if (typeof globalThis.proto === 'undefined') {
+    // @ts-ignore
+    globalThis.proto = {};
+}
+
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import startServer from "./server/server.js";
 
@@ -17,4 +27,4 @@ async function main() {
 main().catch((error) => {
   console.error("Fatal error in main():", error);
   process.exit(1);
-}); 
+});
