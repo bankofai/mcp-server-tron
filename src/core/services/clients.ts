@@ -1,5 +1,5 @@
-import { TronWeb } from 'tronweb';
-import { getNetworkConfig } from '../chains.js';
+import { TronWeb } from "tronweb";
+import { getNetworkConfig } from "../chains.js";
 
 // Cache for clients to avoid recreating them for each request
 const clientCache = new Map<string, TronWeb>();
@@ -7,43 +7,43 @@ const clientCache = new Map<string, TronWeb>();
 /**
  * Get a TronWeb instance for a specific network
  */
-export function getTronWeb(network = 'mainnet'): TronWeb {
+export function getTronWeb(network = "mainnet"): TronWeb {
   const cacheKey = String(network);
-  
+
   // Return cached client if available
   if (clientCache.has(cacheKey)) {
     return clientCache.get(cacheKey)!;
   }
-  
+
   // Create a new client
   const config = getNetworkConfig(network);
-  
+
   const client = new TronWeb({
     fullHost: config.fullNode,
     solidityNode: config.solidityNode,
     eventServer: config.eventServer,
   });
-  
+
   // Cache the client
   clientCache.set(cacheKey, client);
-  
+
   return client;
 }
 
 /**
  * Create a TronWeb instance with a private key for signing
  */
-export function getWallet(privateKey: string, network = 'mainnet'): TronWeb {
+export function getWallet(privateKey: string, network = "mainnet"): TronWeb {
   const config = getNetworkConfig(network);
-  
+
   // TronWeb expects private key without 0x prefix usually, but handles it if present?
   // Let's strip 0x to be safe as TronWeb often prefers clean hex
-  const cleanKey = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey;
+  const cleanKey = privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey;
 
   return new TronWeb({
     fullHost: config.fullNode,
     solidityNode: config.solidityNode,
     eventServer: config.eventServer,
-    privateKey: cleanKey
+    privateKey: cleanKey,
   });
 }

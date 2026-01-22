@@ -3,12 +3,7 @@ import { describe, expect, it } from "vitest";
 const BASE58_ADDRESS = "TFyiaYiJoCAPhZZfshRS9CD88XbyKkqjZq";
 const HEX_ADDRESS_41 = "4141e971d57dd131214af645e8d5d4d38f51e512ce";
 
-import { 
-    toHexAddress, 
-    toBase58Address, 
-    isBase58, 
-    isHex 
-} from "../../../src/core/services/address";
+import { toHexAddress, toBase58Address, isBase58, isHex } from "../../../src/core/services/address";
 
 describe("Address Service", () => {
   it("should convert Base58 to Hex", () => {

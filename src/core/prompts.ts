@@ -25,19 +25,22 @@ export function registerTRONPrompts(server: McpServer) {
     {
       description: "Safely prepare and execute a token transfer with validation checks",
       argsSchema: {
-        tokenType: z.enum(["trx", "trc20"]).describe("Token type: 'trx' for native or 'trc20' for contract tokens"),
+        tokenType: z
+          .enum(["trx", "trc20"])
+          .describe("Token type: 'trx' for native or 'trc20' for contract tokens"),
         recipient: z.string().describe("Recipient address"),
         amount: z.string().describe("Amount to transfer (in TRX or token units)"),
         network: z.string().optional().describe("Network name (default: mainnet)"),
-        tokenAddress: z.string().optional().describe("Token contract address (required for TRC20)")
-      }
+        tokenAddress: z.string().optional().describe("Token contract address (required for TRC20)"),
+      },
     },
     ({ tokenType, recipient, amount, network = "mainnet", tokenAddress }) => ({
-      messages: [{
-        role: "user",
-        content: {
-          type: "text",
-          text: `# Token Transfer Task
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `# Token Transfer Task
 
 **Objective**: Safely transfer ${amount} ${tokenType === "trx" ? "TRX" : "TRC20 tokens"} to ${recipient} on ${network}
 
@@ -45,24 +48,30 @@ export function registerTRONPrompts(server: McpServer) {
 Before executing any transfer:
 1. **Wallet Verification**: Call \`get_wallet_address\` to confirm the sending wallet
 2. **Balance Check**:
-   ${tokenType === "trx"
-              ? "- Call `get_balance` to verify TRX balance"
-              : "- Call `get_token_balance` with tokenAddress=${tokenAddress} to verify balance"}
+   ${
+     tokenType === "trx"
+       ? "- Call `get_balance` to verify TRX balance"
+       : `- Call \`get_token_balance\` with tokenAddress=${tokenAddress} to verify balance`
+   }
 3. **Resource Analysis**: Call \`get_chain_parameters\` to assess current network costs (Energy/Bandwidth)
 
 ## Execution Steps
-${tokenType === "trx" ? `
+${
+  tokenType === "trx"
+    ? `
 1. Summarize: sender address, recipient, amount, and estimated cost
 2. Request confirmation from user
 3. Call \`transfer_trx\` with to="${recipient}", amount="${amount}", network="${network}"
 4. Return transaction hash to user
 5. Call \`get_transaction_info\` to confirm completion
-` : `
+`
+    : `
 1. Summarize: sender, recipient, token, amount
 2. Request confirmation
 3. Call \`transfer_trc20\` with tokenAddress, recipient, amount
 4. Wait for confirmation with \`get_transaction_info\`
-`}
+`
+}
 
 ## Output Format
 - **Transaction Hash**: Clear hex value
@@ -73,10 +82,11 @@ ${tokenType === "trx" ? `
 - Never send more than available balance
 - Double-check recipient address
 - Explain any approval requirements
-`
-        }
-      }]
-    })
+`,
+          },
+        },
+      ],
+    }),
   );
 
   server.registerPrompt(
@@ -85,15 +95,16 @@ ${tokenType === "trx" ? `
       description: "Analyze transaction status, failures, and provide debugging insights",
       argsSchema: {
         txHash: z.string().describe("Transaction hash to diagnose"),
-        network: z.string().optional().describe("Network name (default: mainnet)")
-      }
+        network: z.string().optional().describe("Network name (default: mainnet)"),
+      },
     },
     ({ txHash, network = "mainnet" }) => ({
-      messages: [{
-        role: "user",
-        content: {
-          type: "text",
-          text: `# Transaction Diagnosis
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `# Transaction Diagnosis
 
 **Objective**: Analyze transaction ${txHash} on ${network} and identify any issues
 
@@ -135,10 +146,11 @@ Provide structured diagnosis:
 - **Resource Usage**: Energy / Bandwidth used
 - **Issue (if failed)**: Root cause and explanation
 - **Recommended Actions**: Next steps to resolve
-`
-        }
-      }]
-    })
+`,
+          },
+        },
+      ],
+    }),
   );
 
   // ============================================================================
@@ -152,17 +164,18 @@ Provide structured diagnosis:
       argsSchema: {
         address: z.string().describe("Wallet address to analyze"),
         network: z.string().optional().describe("Network name (default: mainnet)"),
-        tokens: z.string().optional().describe("Comma-separated token addresses to check")
-      }
+        tokens: z.string().optional().describe("Comma-separated token addresses to check"),
+      },
     },
     ({ address, network = "mainnet", tokens }) => {
-      const tokenList = tokens ? tokens.split(',').map(t => t.trim()) : [];
+      const tokenList = tokens ? tokens.split(",").map((t) => t.trim()) : [];
       return {
-        messages: [{
-          role: "user",
-          content: {
-            type: "text",
-            text: `# Wallet Analysis
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: `# Wallet Analysis
 
 **Objective**: Provide complete asset overview for ${address} on ${network}
 
@@ -176,9 +189,11 @@ Provide structured diagnosis:
 - Report both sun and TRX formats
 
 ### 3. Token Balances
-${tokenList.length > 0
-                ? `- Call \`get_token_balance\` for each token:\n${tokenList.map(t => `  * ${t}`).join('\n')}`
-                : `- If specific tokens provided: call \`get_token_balance\` for each`}
+${
+  tokenList.length > 0
+    ? `- Call \`get_token_balance\` for each token:\n${tokenList.map((t) => `  * ${t}`).join("\n")}`
+    : `- If specific tokens provided: call \`get_token_balance\` for each`
+}
 
 ## Output Format
 
@@ -202,11 +217,12 @@ Provide analysis with clear sections:
 **Summary**
 - Primary holdings
 - Notable observations
-`
-          }
-        }]
+`,
+            },
+          },
+        ],
       };
-    }
+    },
   );
 
   // ============================================================================
@@ -218,15 +234,16 @@ Provide analysis with clear sections:
     {
       description: "Check current network health and conditions",
       argsSchema: {
-        network: z.string().optional().describe("Network name (default: mainnet)")
-      }
+        network: z.string().optional().describe("Network name (default: mainnet)"),
+      },
     },
     ({ network = "mainnet" }) => ({
-      messages: [{
-        role: "user",
-        content: {
-          type: "text",
-          text: `# Network Status Check
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `# Network Status Check
 
 **Objective**: Assess health and current conditions of ${network}
 
@@ -271,9 +288,10 @@ Call these read-only tools:
 
 For **sending transactions now**:
 - Status is Green/Yellow/Red
-`
-        }
-      }]
-    })
+`,
+          },
+        },
+      ],
+    }),
   );
 }

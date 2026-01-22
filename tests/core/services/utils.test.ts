@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-// import { utils } from "../../../src/core/services/utils"; 
+// import { utils } from "../../../src/core/services/utils";
 // We will import utils directly which imports tronweb
 import { utils } from "../../../src/core/services/utils";
 
@@ -30,11 +30,11 @@ describe("Utils", () => {
     expect(utils.numberToHex(10)).toBe("0xa");
     expect(utils.numberToHex(255)).toBe("0xff");
   });
-  
+
   it("should check isAddress", () => {
-      // Valid Tron Address (mocked)
-      expect(utils.isAddress("T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb")).toBe(true);
-      // Invalid
-      expect(utils.isAddress("InvalidAddress")).toBe(false);
+    // Valid Tron Address (mocked)
+    expect(utils.isAddress("T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb")).toBe(true);
+    // Invalid
+    expect(utils.isAddress("InvalidAddress")).toBe(false);
   });
 });

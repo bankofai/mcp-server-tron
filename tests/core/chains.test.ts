@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { 
-  getNetworkConfig, 
-  getRpcUrl, 
-  getSupportedNetworks, 
-  TronNetwork, 
+import {
+  getNetworkConfig,
+  getRpcUrl,
+  getSupportedNetworks,
+  TronNetwork,
   DEFAULT_NETWORK,
-  NETWORKS
+  NETWORKS,
 } from "../../src/core/chains";
 
 describe("Chains", () => {
@@ -44,7 +44,9 @@ describe("Chains", () => {
   });
 
   it("should throw error for unsupported network", () => {
-    expect(() => getNetworkConfig("invalid_network")).toThrow("Unsupported network: invalid_network");
+    expect(() => getNetworkConfig("invalid_network")).toThrow(
+      "Unsupported network: invalid_network",
+    );
   });
 
   it("should use default network if none provided", () => {

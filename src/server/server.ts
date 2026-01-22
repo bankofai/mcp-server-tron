@@ -11,23 +11,23 @@ async function startServer() {
     const server = new McpServer(
       {
         name: "tron-mcp-server",
-        version: "2.0.0"
+        version: "2.0.0",
       },
       {
         capabilities: {
           tools: {
-            listChanged: true
+            listChanged: true,
           },
           resources: {
             subscribe: false,
-            listChanged: true
+            listChanged: true,
           },
           prompts: {
-            listChanged: true
+            listChanged: true,
           },
-          logging: {}
-        }
-      }
+          logging: {},
+        },
+      },
     );
 
     // Register all resources, tools, and prompts

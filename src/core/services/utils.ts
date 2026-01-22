@@ -1,6 +1,6 @@
 // Fix TypeScript error: TronWeb.fromSun returns string, but we can pass string to it (TronWeb types might be outdated or strict)
 
-import { TronWeb } from 'tronweb';
+import { TronWeb } from "tronweb";
 
 // Note: TronWeb handles most of these conversions internally or via utility methods.
 // We are wrapping them here for consistent API usage across the application.
@@ -12,38 +12,38 @@ export const utils = {
   // Convert Tron (ether equivalent) to Sun (wei equivalent)
   // 1 TRX = 1,000,000 SUN
   toSun: (trx: number | string): string => {
-      return TronWeb.toSun(trx as any).toString();
+    return TronWeb.toSun(trx as any).toString();
   },
-  
+
   // Convert Sun to Tron
   fromSun: (sun: number | string | bigint): string => {
-      return TronWeb.fromSun(sun.toString() as any).toString();
+    return TronWeb.fromSun(sun.toString() as any).toString();
   },
-  
+
   // Format a bigint/number to a string
   formatBigInt: (value: bigint | number): string => value.toString(),
-  
+
   // Format an object to JSON with bigint handling
-  formatJson: (obj: unknown): string => JSON.stringify(obj, (_, value) => 
-    typeof value === 'bigint' ? value.toString() : value, 2),
-    
+  formatJson: (obj: unknown): string =>
+    JSON.stringify(obj, (_, value) => (typeof value === "bigint" ? value.toString() : value), 2),
+
   // Format a number with commas
   formatNumber: (value: number | string): string => {
     return Number(value).toLocaleString();
   },
-  
+
   // Convert a hex string to a number
   hexToNumber: (hex: string): number => {
     return parseInt(hex, 16);
   },
-  
+
   // Convert a number to a hex string
   numberToHex: (num: number): string => {
-    return '0x' + num.toString(16);
+    return "0x" + num.toString(16);
   },
 
   // Tron specific utils
   isAddress: (address: string): boolean => {
-      return TronWeb.isAddress(address);
-  }
+    return TronWeb.isAddress(address);
+  },
 };

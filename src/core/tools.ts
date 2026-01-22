@@ -2,7 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { getSupportedNetworks, getRpcUrl } from "./chains.js";
 import * as services from "./services/index.js";
-import { TronWeb } from 'tronweb';
 
 /**
  * Register all TRON-related tools with the MCP server
@@ -20,7 +19,7 @@ import { TronWeb } from 'tronweb';
  */
 export function registerTRONTools(server: McpServer) {
   // Helpers are now imported from services/wallet.ts
-  const { getConfiguredPrivateKey, getWalletAddressFromKey, getConfiguredWallet } = services;
+  const { getConfiguredPrivateKey, getWalletAddressFromKey } = services;
 
   // ============================================================================
   // WALLET INFORMATION TOOLS (Read-only)
@@ -29,37 +28,49 @@ export function registerTRONTools(server: McpServer) {
   server.registerTool(
     "get_wallet_address",
     {
-      description: "Get the address of the configured wallet. Use this to verify which wallet is active.",
+      description:
+        "Get the address of the configured wallet. Use this to verify which wallet is active.",
       inputSchema: {},
       annotations: {
         title: "Get Wallet Address",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: false
-      }
+        openWorldHint: false,
+      },
     },
     async () => {
       try {
         const address = getWalletAddressFromKey();
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              address,
-              base58: services.toBase58Address(address),
-              hex: services.toHexAddress(address),
-              message: "This is the wallet that will be used for all transactions"
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  address,
+                  base58: services.toBase58Address(address),
+                  hex: services.toHexAddress(address),
+                  message: "This is the wallet that will be used for all transactions",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   // ============================================================================
@@ -71,15 +82,18 @@ export function registerTRONTools(server: McpServer) {
     {
       description: "Get information about a TRON network: current block number and RPC endpoint",
       inputSchema: {
-        network: z.string().optional().describe("Network name (mainnet, nile, shasta). Defaults to mainnet.")
+        network: z
+          .string()
+          .optional()
+          .describe("Network name (mainnet, nile, shasta). Defaults to mainnet."),
       },
       annotations: {
         title: "Get Chain Info",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ network = "mainnet" }) => {
       try {
@@ -88,18 +102,29 @@ export function registerTRONTools(server: McpServer) {
         const rpcUrl = getRpcUrl(network);
 
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({ network, chainId, blockNumber: blockNumber.toString(), rpcUrl }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                { network, chainId, blockNumber: blockNumber.toString(), rpcUrl },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error fetching chain info: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error fetching chain info: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -112,38 +137,46 @@ export function registerTRONTools(server: McpServer) {
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: false
-      }
+        openWorldHint: false,
+      },
     },
     async () => {
       try {
         const networks = getSupportedNetworks();
         return {
-          content: [{ type: "text", text: JSON.stringify({ supportedNetworks: networks }, null, 2) }]
+          content: [
+            { type: "text", text: JSON.stringify({ supportedNetworks: networks }, null, 2) },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   server.registerTool(
     "get_chain_parameters",
     {
-      description: "Get current chain parameters (proposal values) including Energy and Bandwidth costs.",
+      description:
+        "Get current chain parameters (proposal values) including Energy and Bandwidth costs.",
       inputSchema: {
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Get Chain Parameters",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: false,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ network = "mainnet" }) => {
       try {
@@ -151,21 +184,32 @@ export function registerTRONTools(server: McpServer) {
         const parameters = await tronWeb.trx.getChainParameters();
 
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              network,
-              parameters
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  network,
+                  parameters,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error fetching chain parameters: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error fetching chain parameters: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   // ============================================================================
@@ -184,29 +228,40 @@ export function registerTRONTools(server: McpServer) {
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ address }) => {
       try {
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              original: address,
-              base58: services.toBase58Address(address),
-              hex: services.toHexAddress(address),
-              isValid: services.utils.isAddress(address)
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  original: address,
+                  base58: services.toBase58Address(address),
+                  hex: services.toHexAddress(address),
+                  isValid: services.utils.isAddress(address),
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error converting address: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error converting address: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   // ============================================================================
@@ -219,21 +274,24 @@ export function registerTRONTools(server: McpServer) {
       description: "Get block details by block number or hash",
       inputSchema: {
         blockIdentifier: z.string().describe("Block number (as string) or block hash"),
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Get Block",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ blockIdentifier, network = "mainnet" }) => {
       try {
         let block;
         // Check if it's a hash (hex string usually 64 chars + prefix) or number
-        if (blockIdentifier.startsWith("0x") || (blockIdentifier.length > 20 && isNaN(Number(blockIdentifier)))) {
+        if (
+          blockIdentifier.startsWith("0x") ||
+          (blockIdentifier.length > 20 && isNaN(Number(blockIdentifier)))
+        ) {
           // Assume hash
           block = await services.getBlockByHash(blockIdentifier, network);
         } else {
@@ -243,11 +301,16 @@ export function registerTRONTools(server: McpServer) {
         return { content: [{ type: "text", text: services.helpers.formatJson(block) }] };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error fetching block: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error fetching block: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -255,15 +318,15 @@ export function registerTRONTools(server: McpServer) {
     {
       description: "Get the latest block from the network",
       inputSchema: {
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Get Latest Block",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: false,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ network = "mainnet" }) => {
       try {
@@ -271,11 +334,16 @@ export function registerTRONTools(server: McpServer) {
         return { content: [{ type: "text", text: services.helpers.formatJson(block) }] };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error fetching latest block: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error fetching latest block: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   // ============================================================================
@@ -288,36 +356,47 @@ export function registerTRONTools(server: McpServer) {
       description: "Get the TRX balance for an address",
       inputSchema: {
         address: z.string().describe("The wallet address (Base58)"),
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Get TRX Balance",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ address, network = "mainnet" }) => {
       try {
         const balance = await services.getTRXBalance(address, network);
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              network,
-              address,
-              balance: { sun: balance.wei.toString(), trx: balance.formatted }
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  network,
+                  address,
+                  balance: { sun: balance.wei.toString(), trx: balance.formatted },
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error fetching balance: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error fetching balance: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -327,42 +406,53 @@ export function registerTRONTools(server: McpServer) {
       inputSchema: {
         address: z.string().describe("The wallet address"),
         tokenAddress: z.string().describe("The TRC20 token contract address"),
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Get TRC20 Token Balance",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ address, tokenAddress, network = "mainnet" }) => {
       try {
         const balance = await services.getTRC20Balance(tokenAddress, address, network);
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              network,
-              tokenAddress,
-              address,
-              balance: {
-                raw: balance.raw.toString(),
-                formatted: balance.formatted,
-                symbol: balance.token.symbol,
-                decimals: balance.token.decimals
-              }
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  network,
+                  tokenAddress,
+                  address,
+                  balance: {
+                    raw: balance.raw.toString(),
+                    formatted: balance.formatted,
+                    symbol: balance.token.symbol,
+                    decimals: balance.token.decimals,
+                  },
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error fetching token balance: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error fetching token balance: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   // ============================================================================
@@ -375,15 +465,15 @@ export function registerTRONTools(server: McpServer) {
       description: "Get transaction details by transaction hash",
       inputSchema: {
         txHash: z.string().describe("Transaction hash"),
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Get Transaction",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ txHash, network = "mainnet" }) => {
       try {
@@ -391,11 +481,16 @@ export function registerTRONTools(server: McpServer) {
         return { content: [{ type: "text", text: services.helpers.formatJson(tx) }] };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error fetching transaction: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error fetching transaction: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -404,15 +499,15 @@ export function registerTRONTools(server: McpServer) {
       description: "Get transaction info (receipt/confirmation status, energy usage, logs).",
       inputSchema: {
         txHash: z.string().describe("Transaction hash"),
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Get Transaction Info",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ txHash, network = "mainnet" }) => {
       try {
@@ -420,11 +515,16 @@ export function registerTRONTools(server: McpServer) {
         return { content: [{ type: "text", text: services.helpers.formatJson(info) }] };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error fetching transaction info: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error fetching transaction info: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   // ============================================================================
@@ -439,97 +539,127 @@ export function registerTRONTools(server: McpServer) {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name (e.g., 'name', 'symbol', 'balanceOf')"),
         args: z.array(z.any()).optional().describe("Function arguments"),
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Read Smart Contract",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ contractAddress, functionName, args = [], network = "mainnet" }) => {
       try {
-        const result = await services.readContract({
+        const result = await services.readContract(
+          {
             address: contractAddress,
             functionName,
-            args
-        }, network);
+            args,
+          },
+          network,
+        );
 
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              contractAddress,
-              function: functionName,
-              args: args.length > 0 ? args : undefined,
-              result: services.helpers.formatJson(result)
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  contractAddress,
+                  function: functionName,
+                  args: args.length > 0 ? args : undefined,
+                  result: services.helpers.formatJson(result),
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error reading contract: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error reading contract: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   server.registerTool(
     "write_contract",
     {
-      description: "Execute state-changing functions on a smart contract. Requires configured wallet.",
+      description:
+        "Execute state-changing functions on a smart contract. Requires configured wallet.",
       inputSchema: {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name to call"),
         args: z.array(z.any()).optional().describe("Function arguments"),
         value: z.string().optional().describe("TRX value to send (in Sun)"),
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Write to Smart Contract",
         readOnlyHint: false,
         destructiveHint: true,
         idempotentHint: false,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ contractAddress, functionName, args = [], value, network = "mainnet" }) => {
       try {
         const privateKey = getConfiguredPrivateKey();
         const senderAddress = getWalletAddressFromKey();
-        
-        const txHash = await services.writeContract(privateKey, {
+
+        const txHash = await services.writeContract(
+          privateKey,
+          {
             address: contractAddress,
             functionName,
             args,
-            value
-        }, network);
+            value,
+          },
+          network,
+        );
 
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              network,
-              contractAddress,
-              function: functionName,
-              args: args.length > 0 ? args : undefined,
-              value: value || undefined,
-              from: senderAddress,
-              txHash,
-              message: "Transaction sent. Use get_transaction_info to check confirmation."
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  network,
+                  contractAddress,
+                  function: functionName,
+                  args: args.length > 0 ? args : undefined,
+                  value: value || undefined,
+                  from: senderAddress,
+                  txHash,
+                  message: "Transaction sent. Use get_transaction_info to check confirmation.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error writing to contract: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error writing to contract: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   // ============================================================================
@@ -543,15 +673,15 @@ export function registerTRONTools(server: McpServer) {
       inputSchema: {
         to: z.string().describe("Recipient address"),
         amount: z.string().describe("Amount to send in TRX (e.g., '10.5')"),
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Transfer TRX",
         readOnlyHint: false,
         destructiveHint: true,
         idempotentHint: false,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ to, amount, network = "mainnet" }) => {
       try {
@@ -559,25 +689,36 @@ export function registerTRONTools(server: McpServer) {
         const senderAddress = getWalletAddressFromKey();
         const txHash = await services.transferTRX(privateKey, to, amount, network);
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              network,
-              from: senderAddress,
-              to,
-              amount: `${amount} TRX`,
-              txHash,
-              message: "Transaction sent. Use get_transaction_info to check confirmation."
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  network,
+                  from: senderAddress,
+                  to,
+                  amount: `${amount} TRX`,
+                  txHash,
+                  message: "Transaction sent. Use get_transaction_info to check confirmation.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error transferring TRX: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error transferring TRX: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -588,15 +729,15 @@ export function registerTRONTools(server: McpServer) {
         tokenAddress: z.string().describe("The TRC20 token contract address"),
         to: z.string().describe("Recipient address"),
         amount: z.string().describe("Amount to send (raw amount with decimals)"),
-        network: z.string().optional().describe("Network name. Defaults to mainnet.")
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
         title: "Transfer TRC20 Tokens",
         readOnlyHint: false,
         destructiveHint: true,
         idempotentHint: false,
-        openWorldHint: true
-      }
+        openWorldHint: true,
+      },
     },
     async ({ tokenAddress, to, amount, network = "mainnet" }) => {
       try {
@@ -604,28 +745,39 @@ export function registerTRONTools(server: McpServer) {
         const senderAddress = getWalletAddressFromKey();
         const result = await services.transferTRC20(tokenAddress, to, amount, privateKey, network);
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              network,
-              tokenAddress,
-              from: senderAddress,
-              to,
-              amount: result.amount.formatted,
-              symbol: result.token.symbol,
-              decimals: result.token.decimals,
-              txHash: result.txHash,
-              message: "Transaction sent."
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  network,
+                  tokenAddress,
+                  from: senderAddress,
+                  to,
+                  amount: result.amount.formatted,
+                  symbol: result.token.symbol,
+                  decimals: result.token.decimals,
+                  txHash: result.txHash,
+                  message: "Transaction sent.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error transferring TRC20 tokens: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error transferring TRC20 tokens: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 
   // ============================================================================
@@ -637,37 +789,48 @@ export function registerTRONTools(server: McpServer) {
     {
       description: "Sign an arbitrary message using the configured wallet.",
       inputSchema: {
-        message: z.string().describe("The message to sign")
+        message: z.string().describe("The message to sign"),
       },
       annotations: {
         title: "Sign Message",
         readOnlyHint: false,
         destructiveHint: false,
         idempotentHint: true,
-        openWorldHint: false
-      }
+        openWorldHint: false,
+      },
     },
     async ({ message }) => {
       try {
         const senderAddress = getWalletAddressFromKey();
         const signature = await services.signMessage(message);
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              message,
-              signature,
-              signer: senderAddress,
-              messageType: "personal_sign"
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  message,
+                  signature,
+                  signer: senderAddress,
+                  messageType: "personal_sign",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error signing message: ${error instanceof Error ? error.message : String(error)}` }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: `Error signing message: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
         };
       }
-    }
+    },
   );
 }

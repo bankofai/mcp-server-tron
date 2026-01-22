@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       version_type:
-        description: 'Version type (prerelease, prepatch, patch, preminor, minor, premajor, major)'
+        description: "Version type (prerelease, prepatch, patch, preminor, minor, premajor, major)"
         required: true
-        default: 'patch'
+        default: "patch"
         type: choice
         options:
           - prerelease
@@ -17,13 +17,13 @@ on:
           - premajor
           - major
       custom_version:
-        description: 'Custom version (leave empty to use version_type)'
+        description: "Custom version (leave empty to use version_type)"
         required: false
         type: string
       dist_tag:
-        description: 'npm distribution tag (latest, next, beta, etc)'
+        description: "npm distribution tag (latest, next, beta, etc)"
         required: false
-        default: 'latest'
+        default: "latest"
         type: string
 
 jobs:
@@ -43,8 +43,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "18.x"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1

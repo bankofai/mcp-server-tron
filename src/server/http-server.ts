@@ -12,7 +12,7 @@ console.error(`Configured to listen on ${HOST}:${PORT}`);
 
 // Setup Express
 const app = express();
-app.use(express.json({ limit: '10mb' })); // Prevent DoS attacks with huge payloads
+app.use(express.json({ limit: "10mb" })); // Prevent DoS attacks with huge payloads
 
 // Track active transports by session ID with cleanup
 const transports = new Map<string, StreamableHTTPServerTransport>();
@@ -20,32 +20,37 @@ const sessionTimestamps = new Map<string, number>();
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
 // Cleanup stale sessions periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [sessionId, timestamp] of sessionTimestamps.entries()) {
-    if (now - timestamp > SESSION_TIMEOUT_MS) {
-      console.error(`Cleaning up stale session: ${sessionId}`);
-      const transport = transports.get(sessionId);
-      if (transport) {
-        transport.close().catch(err =>
-          console.error(`Error closing stale session ${sessionId}:`, err)
-        );
+setInterval(
+  () => {
+    const now = Date.now();
+    for (const [sessionId, timestamp] of sessionTimestamps.entries()) {
+      if (now - timestamp > SESSION_TIMEOUT_MS) {
+        console.error(`Cleaning up stale session: ${sessionId}`);
+        const transport = transports.get(sessionId);
+        if (transport) {
+          transport
+            .close()
+            .catch((err) => console.error(`Error closing stale session ${sessionId}:`, err));
+        }
+        transports.delete(sessionId);
+        sessionTimestamps.delete(sessionId);
       }
-      transports.delete(sessionId);
-      sessionTimestamps.delete(sessionId);
     }
-  }
-}, 5 * 60 * 1000); // Check every 5 minutes
+  },
+  5 * 60 * 1000,
+); // Check every 5 minutes
 
 // Initialize the MCP server
 let server: McpServer | null = null;
-startServer().then(s => {
-  server = s;
-  console.error("MCP Server initialized successfully");
-}).catch(error => {
-  console.error("Failed to initialize server:", error);
-  process.exit(1);
-});
+startServer()
+  .then((s) => {
+    server = s;
+    console.error("MCP Server initialized successfully");
+  })
+  .catch((error) => {
+    console.error("Failed to initialize server:", error);
+    process.exit(1);
+  });
 
 // Handle all MCP requests through POST /mcp
 app.post("/mcp", async (req: Request, res: Response) => {
@@ -79,7 +84,7 @@ app.post("/mcp", async (req: Request, res: Response) => {
         console.error(`Session closed: ${closedSessionId}`);
         transports.delete(closedSessionId);
         sessionTimestamps.delete(closedSessionId);
-      }
+      },
     });
 
     // Connect the transport to the server
@@ -158,7 +163,7 @@ app.get("/health", (_req: Request, res: Response) => {
     status: "ok",
     server: server ? "initialized" : "initializing",
     activeSessions: transports.size,
-    sessionIds: Array.from(transports.keys())
+    sessionIds: Array.from(transports.keys()),
   });
 });
 
@@ -171,16 +176,16 @@ app.get("/", (_req: Request, res: Response) => {
     transport: "Streamable HTTP",
     endpoints: {
       mcp: "/mcp",
-      health: "/health"
+      health: "/health",
     },
     status: server ? "ready" : "initializing",
-    activeSessions: transports.size
+    activeSessions: transports.size,
   });
 });
 
 // Handle process termination gracefully
-process.on('SIGINT', async () => {
-  console.error('Shutting down server...');
+process.on("SIGINT", async () => {
+  console.error("Shutting down server...");
 
   // Close all active transports
   for (const [sessionId, transport] of transports) {
@@ -192,8 +197,8 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-process.on('SIGTERM', async () => {
-  console.error('Received SIGTERM, shutting down...');
+process.on("SIGTERM", async () => {
+  console.error("Received SIGTERM, shutting down...");
 
   for (const [sessionId, transport] of transports) {
     console.error(`Closing transport for session: ${sessionId}`);
@@ -205,15 +210,17 @@ process.on('SIGTERM', async () => {
 });
 
 // Start the HTTP server
-const httpServer = app.listen(PORT, HOST, () => {
-  console.error(`TRON MCP Server running at http://${HOST}:${PORT}`);
-  console.error(`MCP endpoint: http://${HOST}:${PORT}/mcp`);
-  console.error(`Health check: http://${HOST}:${PORT}/health`);
-  console.error(`Protocol: MCP 2025-06-18 (Streamable HTTP)`);
-}).on('error', (err: Error) => {
-  console.error(`Server error: ${err}`);
-  process.exit(1);
-});
+const httpServer = app
+  .listen(PORT, HOST, () => {
+    console.error(`TRON MCP Server running at http://${HOST}:${PORT}`);
+    console.error(`MCP endpoint: http://${HOST}:${PORT}/mcp`);
+    console.error(`Health check: http://${HOST}:${PORT}/health`);
+    console.error(`Protocol: MCP 2025-06-18 (Streamable HTTP)`);
+  })
+  .on("error", (err: Error) => {
+    console.error(`Server error: ${err}`);
+    process.exit(1);
+  });
 
 // Set server timeout to prevent hanging connections
 httpServer.timeout = 120000; // 2 minutes

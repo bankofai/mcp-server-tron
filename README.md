@@ -32,6 +32,7 @@ A comprehensive Model Context Protocol (MCP) server that provides blockchain ser
 The MCP TRON Server leverages the Model Context Protocol to provide blockchain services to AI agents. It fully supports the TRON ecosystem using `tronweb`.
 
 Key capabilities:
+
 - **Blockchain Data**: Read blocks, transactions, and chain parameters (Energy/Bandwidth costs).
 - **Smart Contracts**: Interact with any TRON smart contract (Read/Write).
 - **Tokens**: Transfer TRX and TRC20 tokens; check balances.
@@ -174,33 +175,40 @@ Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude
 ### Tools
 
 #### Wallet & Address
+
 - `get_wallet_address`: Get the configured wallet's address (Base58 & Hex).
 - `convert_address`: Convert between Hex and Base58 formats.
 
 #### Network & Resources
+
 - `get_chain_info`: Get current block and chain ID.
 - `get_chain_parameters`: Get current Energy and Bandwidth costs.
 - `get_supported_networks`: List available networks.
 
 #### Blocks & Transactions
+
 - `get_block`: Fetch block by number or hash.
 - `get_latest_block`: Get the latest block.
 - `get_transaction`: Get transaction details.
 - `get_transaction_info`: Get transaction receipt/info (including resource usage).
 
 #### Balances
+
 - `get_balance`: Get TRX balance.
 - `get_token_balance`: Get TRC20 token balance.
 
 #### Transfers (Write)
+
 - `transfer_trx`: Send TRX.
 - `transfer_trc20`: Send TRC20 tokens.
 
 #### Smart Contracts
+
 - `read_contract`: Call read-only contract functions.
 - `write_contract`: Call state-changing contract functions.
 
 #### Signing
+
 - `sign_message`: Sign a text message with the configured wallet.
 
 ### Prompts
