@@ -166,7 +166,7 @@ export function registerTRONTools(server: McpServer) {
     "get_chain_parameters",
     {
       description:
-        "Get current chain parameters (proposal values) including Energy and Bandwidth costs.",
+        "Get current chain parameters including Energy and Bandwidth unit prices. Returns structured fee information similar to gas price queries.",
       inputSchema: {
         network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
@@ -183,18 +183,25 @@ export function registerTRONTools(server: McpServer) {
         const tronWeb = services.getTronWeb(network);
         const parameters = await tronWeb.trx.getChainParameters();
 
+        const paramMap = new Map<string, number | undefined>();
+        for (const param of parameters) {
+          if (param.key) {
+            paramMap.set(param.key, param.value);
+          }
+        }
+
+        const result = {
+          network,
+          energy_price_sun: paramMap.get("getEnergyFee"), // Energy unit price (sun per unit)
+          bandwidth_price_sun: paramMap.get("getTransactionFee"), // Bandwidth unit price (sun per byte)
+          all_parameters: parameters,
+        };
+
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(
-                {
-                  network,
-                  parameters,
-                },
-                null,
-                2,
-              ),
+              text: JSON.stringify(result, null, 2),
             },
           ],
         };
@@ -538,7 +545,10 @@ export function registerTRONTools(server: McpServer) {
       inputSchema: {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name (e.g., 'name', 'symbol', 'balanceOf')"),
-        args: z.array(z.any()).optional().describe("Function arguments"),
+        args: z
+          .array(z.union([z.string(), z.number(), z.boolean()]))
+          .optional()
+          .describe("Function arguments"),
         network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
@@ -599,7 +609,10 @@ export function registerTRONTools(server: McpServer) {
       inputSchema: {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name to call"),
-        args: z.array(z.any()).optional().describe("Function arguments"),
+        args: z
+          .array(z.union([z.string(), z.number(), z.boolean()]))
+          .optional()
+          .describe("Function arguments"),
         value: z.string().optional().describe("TRX value to send (in Sun)"),
         network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
