@@ -16,18 +16,13 @@ const httpMode = args.includes('--http') || args.includes('-h');
 console.error(`Starting TRON MCP Server in ${httpMode ? 'HTTP' : 'stdio'} mode...`);
 
 // Determine which file to execute
-const scriptPath = resolve(__dirname, '../build', httpMode ? 'http-server.js' : 'index.js');
+const scriptPath = resolve(__dirname, '../build', httpMode ? 'server/http-server.js' : 'index.js');
 
 try {
   // Check if the built files exist
   require.resolve(scriptPath);
   
   // Execute the server
-  // We use 'node' here assuming the build target is node compatible (which we set in bun build)
-  // However, since we might need the globalThis.proto polyfill behavior if it wasn't baked in correctly
-  // (though it is in src/index.ts), running via node should be fine as long as the build is self-contained.
-  // BUT: The build was done with Bun.
-  
   const server = spawn('node', [scriptPath], {
     stdio: 'inherit',
     shell: false

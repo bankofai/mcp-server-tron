@@ -15,7 +15,7 @@ export async function transferTRX(
   // Convert TRX to Sun
   const amountSun = utils.toSun(amount as any);
   
-  const tx = await tronWeb.trx.sendTransaction(to, amountSun);
+  const tx = await tronWeb.trx.sendTransaction(to, amountSun as any);
   
   // If result is just true/false (older TronWeb), handle it? 
   // Newer TronWeb returns transaction object usually.

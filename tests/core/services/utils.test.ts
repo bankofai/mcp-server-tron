@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 // import { utils } from "../../../src/core/services/utils"; 
 // We will import utils directly which imports tronweb
 import { utils } from "../../../src/core/services/utils";

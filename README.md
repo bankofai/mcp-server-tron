@@ -82,8 +82,8 @@ Key capabilities:
 
 ## 🛠️ Prerequisites
 
-- [Bun](https://bun.sh/) 1.0.0 or higher (recommended)
-- Node.js 20.0.0 or higher (if not using Bun)
+- [Node.js](https://nodejs.org/) 20.0.0 or higher
+- Optional: [Tronscan API key](https://tronscan.org/) for ABI fetching
 
 ## 📦 Installation
 
@@ -92,10 +92,7 @@ Key capabilities:
 git clone https://github.com/sun-protocol/tron-mcp-server.git
 cd tron-mcp-server
 
-# Install dependencies with Bun
-bun install
-
-# Or with npm
+# Install dependencies
 npm install
 ```
 
@@ -130,10 +127,10 @@ The server runs on port **3001** by default in HTTP mode.
 
 ```bash
 # Start in stdio mode (for MCP clients like Claude Desktop/Cursor)
-bun start
+npm start
 
 # Start in HTTP mode (Server-Sent Events)
-bun start:http
+npm run start:http
 ```
 
 ### Connecting from Cursor / Claude Desktop
@@ -146,8 +143,8 @@ Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude
 {
   "mcpServers": {
     "tron-mcp-server": {
-      "command": "bun",
-      "args": ["run", "/ABSOLUTE/PATH/TO/tron-mcp-server/src/index.ts"],
+      "command": "npx",
+      "args": ["tsx", "/ABSOLUTE/PATH/TO/tron-mcp-server/src/index.ts"],
       "env": {
         "TRON_PRIVATE_KEY": "your_private_key_hex"
       }
