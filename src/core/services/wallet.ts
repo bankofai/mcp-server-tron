@@ -5,20 +5,20 @@ import { privateKeyToAccount, mnemonicToAccount, type HDAccount, type PrivateKey
  * Get the configured account from environment (private key or mnemonic)
  *
  * Configuration options:
- * - EVM_PRIVATE_KEY: Hex private key (with or without 0x prefix)
- * - EVM_MNEMONIC: BIP-39 mnemonic phrase (12 or 24 words)
- * - EVM_ACCOUNT_INDEX: Optional account index for HD wallet derivation (default: 0)
+ * - TRON_PRIVATE_KEY: Hex private key (with or without 0x prefix)
+ * - TRON_MNEMONIC: BIP-39 mnemonic phrase (12 or 24 words)
+ * - TRON_ACCOUNT_INDEX: Optional account index for HD wallet derivation (default: 0)
  */
 export const getConfiguredAccount = (): HDAccount | PrivateKeyAccount => {
-    const privateKey = process.env.EVM_PRIVATE_KEY;
-    const mnemonic = process.env.EVM_MNEMONIC;
-    const accountIndexStr = process.env.EVM_ACCOUNT_INDEX || '0';
+    const privateKey = process.env.TRON_PRIVATE_KEY;
+    const mnemonic = process.env.TRON_MNEMONIC;
+    const accountIndexStr = process.env.TRON_ACCOUNT_INDEX || '0';
     const accountIndex = parseInt(accountIndexStr, 10);
 
     // Validate account index
     if (isNaN(accountIndex) || accountIndex < 0 || !Number.isInteger(accountIndex)) {
         throw new Error(
-            `Invalid EVM_ACCOUNT_INDEX: "${accountIndexStr}". Must be a non-negative integer.`
+            `Invalid TRON_ACCOUNT_INDEX: "${accountIndexStr}". Must be a non-negative integer.`
         );
     }
 
@@ -31,11 +31,11 @@ export const getConfiguredAccount = (): HDAccount | PrivateKeyAccount => {
         return mnemonicToAccount(mnemonic, { accountIndex });
     } else {
         throw new Error(
-            "Neither EVM_PRIVATE_KEY nor EVM_MNEMONIC environment variable is set. " +
+            "Neither TRON_PRIVATE_KEY nor TRON_MNEMONIC environment variable is set. " +
             "Configure one of them to enable write operations.\n" +
-            "- EVM_PRIVATE_KEY: Your private key in hex format\n" +
-            "- EVM_MNEMONIC: Your 12 or 24 word mnemonic phrase\n" +
-            "- EVM_ACCOUNT_INDEX: (Optional) Account index for HD wallet (default: 0)"
+            "- TRON_PRIVATE_KEY: Your private key in hex format\n" +
+            "- TRON_MNEMONIC: Your 12 or 24 word mnemonic phrase\n" +
+            "- TRON_ACCOUNT_INDEX: (Optional) Account index for HD wallet (default: 0)"
         );
     }
 };
@@ -64,7 +64,7 @@ export const getConfiguredPrivateKey = (): Hex => {
 
     // For PrivateKeyAccount, re-read from environment since we created from it
     if ('source' in account && account.source === 'privateKey') {
-        const privateKey = process.env.EVM_PRIVATE_KEY;
+        const privateKey = process.env.TRON_PRIVATE_KEY;
         if (privateKey) {
             return (privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`) as Hex;
         }

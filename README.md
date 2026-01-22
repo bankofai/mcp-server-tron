@@ -1,12 +1,12 @@
-# EVM MCP Server
+# TRON MCP Server
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![EVM Networks](https://img.shields.io/badge/Networks-60+-green)
+![TRON Network](https://img.shields.io/badge/Network-TRON-red)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-3178C6)
 ![MCP](https://img.shields.io/badge/MCP-1.22.0+-blue)
-![Viem](https://img.shields.io/badge/Viem-2.39.3+-green)
+![TronWeb](https://img.shields.io/badge/TronWeb-6.0+-green)
 
-A comprehensive Model Context Protocol (MCP) server that provides blockchain services across 60+ EVM-compatible networks. This server enables AI agents to interact with Ethereum, Optimism, Arbitrum, Base, Polygon, and many other EVM chains with a unified interface through 22 tools and 10 AI-guided prompts.
+A comprehensive Model Context Protocol (MCP) server that provides blockchain services for the TRON network. This server enables AI agents to interact with TRON blockchain with a unified interface through tools and AI-guided prompts for TRX, TRC20, TRC721 tokens and smart contracts.
 
 ## 📋 Contents
 
@@ -30,46 +30,44 @@ A comprehensive Model Context Protocol (MCP) server that provides blockchain ser
 
 ## 🔭 Overview
 
-The MCP EVM Server leverages the Model Context Protocol to provide blockchain services to AI agents. It supports a wide range of services including:
+The MCP TRON Server leverages the Model Context Protocol to provide blockchain services to AI agents. It supports a wide range of services including:
 
 - Reading blockchain state (balances, transactions, blocks, etc.)
 - Interacting with smart contracts with **automatic ABI fetching** from block explorers
-- Transferring tokens (native, ERC20, ERC721, ERC1155)
+- Transferring tokens (native TRX, TRC20, TRC721, TRC1155)
 - Querying token metadata and balances
-- Chain-specific services across 60+ EVM networks (34 mainnets + 26 testnets)
-- **ENS name resolution** for all address parameters (use human-readable names like 'vitalik.eth' instead of addresses)
+- TRON network support (mainnet and testnets)
 - **AI-friendly prompts** that guide agents through complex workflows
 
-All services are exposed through a consistent interface of MCP tools, resources, and prompts, making it easy for AI agents to discover and use blockchain functionality. **Every tool that accepts Ethereum addresses also supports ENS names**, automatically resolving them to addresses behind the scenes. The server includes intelligent ABI fetching, eliminating the need to know contract ABIs in advance.
+All services are exposed through a consistent interface of MCP tools, resources, and prompts, making it easy for AI agents to discover and use blockchain functionality. The server includes intelligent ABI fetching, eliminating the need to know contract ABIs in advance.
 
 ## ✨ Features
 
 ### Blockchain Data Access
 
-- **Multi-chain support** for 60+ EVM-compatible networks (34 mainnets + 26 testnets)
+- **TRON network support** (mainnet and testnets)
 - **Chain information** including blockNumber, chainId, and RPCs
 - **Block data** access by number, hash, or latest
 - **Transaction details** and receipts with decoded logs
 - **Address balances** for native tokens and all token standards
-- **ENS resolution** for human-readable Ethereum addresses (use 'vitalik.eth' instead of '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045')
 
 ### Token services
 
-- **ERC20 Tokens**
+- **TRC20 Tokens**
 
   - Get token metadata (name, symbol, decimals, supply)
   - Check token balances
   - Transfer tokens between addresses
   - Approve spending allowances
 
-- **NFTs (ERC721)**
+- **NFTs (TRC721)**
 
   - Get collection and token metadata
   - Verify token ownership
   - Transfer NFTs between addresses
   - Retrieve token URIs and count holdings
 
-- **Multi-tokens (ERC1155)**
+- **Multi-tokens (TRC1155)**
   - Get token balances and metadata
   - Transfer tokens with quantity
   - Access token URIs
@@ -80,22 +78,21 @@ All services are exposed through a consistent interface of MCP tools, resources,
 - **Write to contracts** - Execute any state-changing function with automatic ABI fetching
 - **Contract verification** to distinguish from EOAs
 - **Event logs** retrieval and filtering
-- **Automatic ABI fetching** from Etherscan v2 API across all 60+ networks (no need to know ABIs in advance)
+- **Automatic ABI fetching** from Tronscan API (no need to know ABIs in advance)
 - **ABI parsing and validation** with function discovery
 
 ### Comprehensive Transaction Support
 
 - **Flexible Wallet Support** - Configure with Private Key or Mnemonic (BIP-39) with HD path support
 - **Native token transfers** across all supported networks
-- **Gas estimation** for transaction planning
+- **Energy/Bandwidth estimation** for transaction planning
 - **Transaction status** and receipt information
 - **Error handling** with descriptive messages
 
 ### Message Signing Capabilities
 
 - **Personal Message Signing** - Sign arbitrary messages for authentication and verification
-- **EIP-712 Typed Data Signing** - Sign structured data for gasless transactions and meta-transactions
-- **SIWE Support** - Enable Sign-In With Ethereum authentication flows
+- **Typed Data Signing** - Sign structured data for gasless transactions and meta-transactions
 - **Permit Signatures** - Create off-chain approvals for gasless token operations
 - **Meta-Transaction Support** - Sign transaction data for relay services and gasless transfers
 
@@ -105,7 +102,7 @@ All services are exposed through a consistent interface of MCP tools, resources,
 - **Wallet analysis** - Tools for analyzing wallet activity and holdings
 - **Smart contract exploration** - Interactive ABI fetching and contract analysis
 - **Contract interaction** - Safe execution of write operations on smart contracts
-- **Network information** - Learning about EVM networks and comparisons
+- **Network information** - Learning about TRON networks and comparisons
 - **Approval auditing** - Reviewing and managing token approvals
 - **Error diagnosis** - Troubleshooting transaction failures
 
@@ -113,77 +110,25 @@ All services are exposed through a consistent interface of MCP tools, resources,
 
 ### Mainnets
 
-- Ethereum (ETH)
-- Optimism (OP)
-- Arbitrum (ARB)
-- Arbitrum Nova
-- Base
-- Polygon (MATIC)
-- Polygon zkEVM
-- Avalanche (AVAX)
-- Binance Smart Chain (BSC)
-- zkSync Era
-- Linea
-- Celo
-- Gnosis (xDai)
-- Fantom (FTM)
-- Filecoin (FIL)
-- Moonbeam
-- Moonriver
-- Cronos
-- Scroll
-- Mantle
-- Manta
-- Blast
-- Fraxtal
-- Mode
-- Metis
-- Kroma
-- Zora
-- Aurora
-- Canto
-- Flow
-- Lumia
+- TRON Mainnet
 
 ### Testnets
 
-- Sepolia
-- Optimism Sepolia
-- Arbitrum Sepolia
-- Base Sepolia
-- Polygon Amoy
-- Avalanche Fuji
-- BSC Testnet
-- zkSync Sepolia
-- Linea Sepolia
-- Scroll Sepolia
-- Mantle Sepolia
-- Manta Sepolia
-- Blast Sepolia
-- Fraxtal Testnet
-- Mode Testnet
-- Metis Sepolia
-- Kroma Sepolia
-- Zora Sepolia
-- Celo Alfajores
-- Goerli
-- Holesky
-- Flow Testnet
-- Filecoin Calibration
-- Lumia Testnet
+- Shasta Testnet
+- Nile Testnet
 
 ## 🛠️ Prerequisites
 
 - [Bun](https://bun.sh/) 1.0.0 or higher (recommended)
 - Node.js 20.0.0 or higher (if not using Bun)
-- Optional: [Etherscan API key](https://etherscan.io/apis) for ABI fetching
+- Optional: [Tronscan API key](https://tronscan.org/) for ABI fetching
 
 ## 📦 Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/mcpdotdirect/mcp-evm-server.git
-cd mcp-evm-server
+git clone https://github.com/sun-protocol/tron-mcp-server.git
+cd tron-mcp-server
 
 # Install dependencies with Bun
 bun install
@@ -205,27 +150,27 @@ You can configure your wallet using **either** a private key or a mnemonic phras
 **Option 1: Private Key**
 
 ```bash
-export EVM_PRIVATE_KEY="0x..." # Your private key in hex format (with or without 0x prefix)
+export TRON_PRIVATE_KEY="0x..." # Your private key in hex format (with or without 0x prefix)
 ```
 
 **Option 2: Mnemonic Phrase (Recommended for HD Wallets)**
 
 ```bash
-export EVM_MNEMONIC="word1 word2 word3 ... word12" # Your 12 or 24 word BIP-39 mnemonic
-export EVM_ACCOUNT_INDEX="0" # Optional: Account index for HD wallet derivation (default: 0)
+export TRON_MNEMONIC="word1 word2 word3 ... word12" # Your 12 or 24 word BIP-39 mnemonic
+export TRON_ACCOUNT_INDEX="0" # Optional: Account index for HD wallet derivation (default: 0)
 ```
 
 The mnemonic option supports hierarchical deterministic (HD) wallet derivation:
 
 - Uses BIP-39 standard mnemonic phrases (12 or 24 words)
-- Supports BIP-44 derivation path: `m/44'/60'/0'/0/{accountIndex}`
-- `EVM_ACCOUNT_INDEX` allows you to derive different accounts from the same mnemonic
+- Supports BIP-44 derivation path: `m/44'/195'/0'/0/{accountIndex}`
+- `TRON_ACCOUNT_INDEX` allows you to derive different accounts from the same mnemonic
 - Default account index is 0 (first account)
 
 **Wallet is used for:**
 
 - Transferring native tokens (`transfer_native` tool)
-- Transferring ERC20 tokens (`transfer_erc20` tool)
+- Transferring TRC20 tokens (`transfer_trc20` tool)
 - Approving token spending (`approve_token_spending` tool)
 - Writing to smart contracts (`write_contract` tool)
 - Signing messages for authentication (`sign_message` tool)
@@ -241,7 +186,7 @@ The mnemonic option supports hierarchical deterministic (HD) wallet derivation:
 #### API Keys (For ABI Fetching)
 
 ```bash
-export ETHERSCAN_API_KEY="your-api-key-here"
+export TRONSCAN_API_KEY="your-api-key-here"
 ```
 
 This API key is optional but required for:
@@ -252,14 +197,13 @@ This API key is optional but required for:
 
 Get your free API key from:
 
-- [Etherscan](https://etherscan.io/apis) - For Ethereum and compatible chains
-- The same key works across all 60+ EVM networks via the Etherscan v2 API
+- [Tronscan](https://tronscan.org/) - For TRON network
 
 ### Server Configuration
 
 The server uses the following default configuration:
 
-- **Default Chain ID**: 1 (Ethereum Mainnet)
+- **Default Network**: TRON Mainnet
 - **Server Port**: 3001
 - **Server Host**: 0.0.0.0 (accessible from any network interface)
 
@@ -272,14 +216,14 @@ These values are hardcoded in the application. If you need to modify them, you c
 
 ### Using npx (No Installation Required)
 
-You can run the MCP EVM Server directly without installation using npx:
+You can run the MCP TRON Server directly without installation using npx:
 
 ```bash
 # Run the server in stdio mode (for CLI tools)
-npx @mcpdotdirect/evm-mcp-server
+npx @sun-protocol/tron-mcp-server
 
 # Run the server in HTTP mode (for web applications)
-npx @mcpdotdirect/evm-mcp-server --http
+npx @sun-protocol/tron-mcp-server --http
 ```
 
 ### Running the Server Locally
@@ -318,9 +262,9 @@ To connect to the MCP server from Cursor:
 4. Click "Add new MCP server"
 5. Enter the following details:
 
-   - Server name: `evm-mcp-server`
+   - Server name: `tron-mcp-server`
    - Type: `command`
-   - Command: `npx @mcpdotdirect/evm-mcp-server`
+   - Command: `npx @sun-protocol/tron-mcp-server`
 
 6. Click "Save"
 
@@ -333,13 +277,13 @@ For a more portable configuration that you can share with your team or use acros
 ```json
 {
   "mcpServers": {
-    "evm-mcp-server": {
+    "tron-mcp-server": {
       "command": "npx",
-      "args": ["-y", "@mcpdotdirect/evm-mcp-server"]
+      "args": ["-y", "@sun-protocol/tron-mcp-server"]
     },
-    "evm-mcp-http": {
+    "tron-mcp-http": {
       "command": "npx",
-      "args": ["-y", "@mcpdotdirect/evm-mcp-server", "--http"]
+      "args": ["-y", "@sun-protocol/tron-mcp-server", "--http"]
     }
   }
 }
@@ -358,7 +302,7 @@ If you're developing a web application and want to connect to the HTTP server wi
 ```json
 {
   "mcpServers": {
-    "evm-mcp-sse": {
+    "tron-mcp-sse": {
       "url": "http://localhost:3001/sse"
     }
   }
@@ -388,12 +332,12 @@ After configuring the MCP server with `mcp.json`, you can easily use it in Curso
 // blockchain-example.js
 async function main() {
   try {
-    // Get ETH balance for an address using ENS
-    console.log("Getting ETH balance for vitalik.eth...");
+    // Get TRX balance for an address
+    console.log("Getting TRX balance for an address...");
 
     // When using with Cursor, you can simply ask Cursor to:
-    // "Check the ETH balance of vitalik.eth on mainnet"
-    // Or "Transfer 0.1 ETH from my wallet to vitalik.eth"
+    // "Check the TRX balance of TAddress on mainnet"
+    // Or "Transfer 10 TRX from my wallet to TAddress"
 
     // Cursor will use the MCP server to execute these operations
     // without requiring any additional code from you
@@ -410,10 +354,10 @@ main();
 
 2. With the file open in Cursor, you can ask Cursor to:
 
-   - "Check the current ETH balance of vitalik.eth"
-   - "Look up the price of USDC on Ethereum"
-   - "Show me the latest block on Optimism"
-   - "Check if 0x1234... is a contract address"
+   - "Check the current TRX balance of TAddress"
+   - "Look up the price of USDT on TRON"
+   - "Show me the latest block on TRON mainnet"
+   - "Check if TAddress is a contract address"
 
 3. Cursor will use the MCP server to execute these operations and return the results directly in your conversation.
 
@@ -425,53 +369,33 @@ If you're using Claude CLI, you can connect to the MCP server with just two comm
 
 ```bash
 # Add the MCP server
-claude mcp add evm-mcp-server npx @mcpdotdirect/evm-mcp-server
+claude mcp add tron-mcp-server npx @sun-protocol/tron-mcp-server
 
 # Start Claude with the MCP server enabled
 claude
 ```
 
-### Example: Getting a Token Balance with ENS
+### Example: Getting a Token Balance
 
 ```javascript
-// Example of using the MCP client to check a token balance using ENS
+// Example of using the MCP client to check a token balance
 const mcp = new McpClient("http://localhost:3000");
 
 const result = await mcp.invokeTool("get-token-balance", {
-  tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
-  ownerAddress: "vitalik.eth", // ENS name instead of address
-  network: "ethereum",
+  tokenAddress: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", // USDT on TRON
+  ownerAddress: "TAddress",
+  network: "mainnet",
 });
 
 console.log(result);
 // {
-//   tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-//   owner: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-//   network: "ethereum",
+//   tokenAddress: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+//   owner: "TAddress",
+//   network: "mainnet",
 //   raw: "1000000000",
 //   formatted: "1000",
-//   symbol: "USDC",
+//   symbol: "USDT",
 //   decimals: 6
-// }
-```
-
-### Example: Resolving an ENS Name
-
-```javascript
-// Example of using the MCP client to resolve an ENS name to an address
-const mcp = new McpClient("http://localhost:3000");
-
-const result = await mcp.invokeTool("resolve-ens", {
-  ensName: "vitalik.eth",
-  network: "ethereum",
-});
-
-console.log(result);
-// {
-//   ensName: "vitalik.eth",
-//   normalizedName: "vitalik.eth",
-//   resolvedAddress: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-//   network: "ethereum"
 // }
 ```
 
@@ -482,19 +406,19 @@ console.log(result);
 const mcp = new McpClient("http://localhost:3000");
 
 const result = await mcp.invokeTool("multicall", {
-  network: "ethereum",
+  network: "mainnet",
   calls: [
     {
-      contractAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+      contractAddress: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", // USDT
       functionName: "balanceOf",
-      args: ["0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"],
+      args: ["TAddress"],
     },
     {
-      contractAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+      contractAddress: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", // USDT
       functionName: "symbol",
     },
     {
-      contractAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+      contractAddress: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", // USDT
       functionName: "decimals",
     },
   ],
@@ -502,14 +426,14 @@ const result = await mcp.invokeTool("multicall", {
 
 console.log(result);
 // {
-//   network: "ethereum",
+//   network: "mainnet",
 //   totalCalls: 3,
 //   successfulCalls: 3,
 //   failedCalls: 0,
 //   results: [
-//     { contractAddress: "0xA0b...", functionName: "balanceOf", result: "1000000000", status: "success" },
-//     { contractAddress: "0xA0b...", functionName: "symbol", result: "USDC", status: "success" },
-//     { contractAddress: "0xA0b...", functionName: "decimals", result: "6", status: "success" }
+//     { contractAddress: "TR7N...", functionName: "balanceOf", result: "1000000000", status: "success" },
+//     { contractAddress: "TR7N...", functionName: "symbol", result: "USDT", status: "success" },
+//     { contractAddress: "TR7N...", functionName: "decimals", result: "6", status: "success" }
 //   ]
 // }
 ```
@@ -518,28 +442,21 @@ console.log(result);
 
 ### Tools
 
-The server provides 25 focused MCP tools for agents. **All tools that accept address parameters support both Ethereum addresses and ENS names.**
+The server provides MCP tools for agents. **All tools that accept address parameters support TRON addresses.**
 
 #### Wallet Information
 
-| Tool Name            | Description                                                     | Key Parameters |
-| -------------------- | --------------------------------------------------------------- | -------------- |
-| `get_wallet_address` | Get the address of the configured wallet (from EVM_PRIVATE_KEY) | none           |
+| Tool Name            | Description                                                      | Key Parameters |
+| -------------------- | ---------------------------------------------------------------- | -------------- |
+| `get_wallet_address` | Get the address of the configured wallet (from TRON_PRIVATE_KEY) | none           |
 
 #### Network Information
 
-| Tool Name                | Description                         | Key Parameters |
-| ------------------------ | ----------------------------------- | -------------- |
-| `get_chain_info`         | Get network information             | `network`      |
-| `get_supported_networks` | List all supported EVM networks     | none           |
-| `get_gas_price`          | Get current gas prices on a network | `network`      |
-
-#### ENS Services
-
-| Tool Name            | Description                        | Key Parameters       |
-| -------------------- | ---------------------------------- | -------------------- |
-| `resolve_ens_name`   | Resolve ENS name to address        | `ensName`, `network` |
-| `lookup_ens_address` | Reverse lookup address to ENS name | `address`, `network` |
+| Tool Name                | Description                          | Key Parameters |
+| ------------------------ | ------------------------------------ | -------------- |
+| `get_chain_info`         | Get network information              | `network`      |
+| `get_supported_networks` | List all supported TRON networks     | none           |
+| `get_gas_price`          | Get current energy prices on network | `network`      |
 
 #### Block & Transaction Information
 
@@ -553,69 +470,69 @@ The server provides 25 focused MCP tools for agents. **All tools that accept add
 
 #### Balance & Token Information
 
-| Tool Name           | Description                    | Key Parameters                                                                                        |
-| ------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| `get_balance`       | Get native token balance       | `address` (address/ENS), `network`                                                                    |
-| `get_token_balance` | Check ERC20 token balance      | `tokenAddress` (address/ENS), `ownerAddress` (address/ENS), `network`                                 |
-| `get_allowance`     | Check token spending allowance | `tokenAddress` (address/ENS), `ownerAddress` (address/ENS), `spenderAddress` (address/ENS), `network` |
+| Tool Name           | Description                    | Key Parameters                                                    |
+| ------------------- | ------------------------------ | ----------------------------------------------------------------- |
+| `get_balance`       | Get native token balance       | `address`, `network`                                              |
+| `get_token_balance` | Check TRC20 token balance      | `tokenAddress`, `ownerAddress`, `network`                         |
+| `get_allowance`     | Check token spending allowance | `tokenAddress`, `ownerAddress`, `spenderAddress`, `network`       |
 
 #### Smart Contract Interactions
 
-| Tool Name          | Description                                                           | Key Parameters                                                                                   |
-| ------------------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `get_contract_abi` | Fetch contract ABI from block explorer (60+ networks)                 | `contractAddress` (address/ENS), `network`                                                       |
-| `read_contract`    | Read smart contract state (auto-fetches ABI if needed)                | `contractAddress`, `functionName`, `args[]`, `abiJson` (optional), `network`                     |
-| `write_contract`   | Execute state-changing functions (auto-fetches ABI if needed)         | `contractAddress`, `functionName`, `args[]`, `value` (optional), `abiJson` (optional), `network` |
-| `multicall`        | Batch multiple read calls into a single RPC request (uses Multicall3) | `calls[]` (array of contract calls), `allowFailure` (optional), `network`                        |
+| Tool Name          | Description                                                   | Key Parameters                                                                                   |
+| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `get_contract_abi` | Fetch contract ABI from block explorer                        | `contractAddress`, `network`                                                                     |
+| `read_contract`    | Read smart contract state (auto-fetches ABI if needed)        | `contractAddress`, `functionName`, `args[]`, `abiJson` (optional), `network`                     |
+| `write_contract`   | Execute state-changing functions (auto-fetches ABI if needed) | `contractAddress`, `functionName`, `args[]`, `value` (optional), `abiJson` (optional), `network` |
+| `multicall`        | Batch multiple read calls into a single RPC request           | `calls[]` (array of contract calls), `allowFailure` (optional), `network`                        |
 
 #### Token Transfers
 
-| Tool Name                | Description                    | Key Parameters                                                                    |
-| ------------------------ | ------------------------------ | --------------------------------------------------------------------------------- |
-| `transfer_native`        | Send native tokens (ETH, etc.) | `to` (address/ENS), `amount`, `network`                                           |
-| `transfer_erc20`         | Transfer ERC20 tokens          | `tokenAddress` (address/ENS), `to` (address/ENS), `amount`, `network`             |
-| `approve_token_spending` | Approve token allowances       | `tokenAddress` (address/ENS), `spenderAddress` (address/ENS), `amount`, `network` |
+| Tool Name                | Description                 | Key Parameters                                            |
+| ------------------------ | --------------------------- | --------------------------------------------------------- |
+| `transfer_native`        | Send native tokens (TRX)    | `to`, `amount`, `network`                                 |
+| `transfer_trc20`         | Transfer TRC20 tokens       | `tokenAddress`, `to`, `amount`, `network`                 |
+| `approve_token_spending` | Approve token allowances    | `tokenAddress`, `spenderAddress`, `amount`, `network`     |
 
 #### NFT Services
 
-| Tool Name             | Description               | Key Parameters                                                                   |
-| --------------------- | ------------------------- | -------------------------------------------------------------------------------- |
-| `get_nft_info`        | Get NFT (ERC721) metadata | `tokenAddress` (address/ENS), `tokenId`, `network`                               |
-| `get_erc1155_balance` | Check ERC1155 balance     | `tokenAddress` (address/ENS), `tokenId`, `ownerAddress` (address/ENS), `network` |
+| Tool Name             | Description                | Key Parameters                                   |
+| --------------------- | -------------------------- | ------------------------------------------------ |
+| `get_nft_info`        | Get NFT (TRC721) metadata  | `tokenAddress`, `tokenId`, `network`             |
+| `get_trc1155_balance` | Check TRC1155 balance      | `tokenAddress`, `tokenId`, `ownerAddress`, `network` |
 
 #### Message Signing
 
-| Tool Name         | Description                                                                              | Key Parameters                                          |
-| ----------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `sign_message`    | Sign arbitrary messages for authentication and verification (SIWE, off-chain signatures) | `message`                                               |
-| `sign_typed_data` | Sign EIP-712 structured data for gasless transactions, permits, and meta-transactions    | `domainJson`, `typesJson`, `primaryType`, `messageJson` |
+| Tool Name         | Description                                                                   | Key Parameters                                          |
+| ----------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `sign_message`    | Sign arbitrary messages for authentication and verification                   | `message`                                               |
+| `sign_typed_data` | Sign structured data for gasless transactions, permits, and meta-transactions | `domainJson`, `typesJson`, `primaryType`, `messageJson` |
 
 ### Resources
 
-The server exposes blockchain data through the following MCP resource URIs. All resource URIs that accept addresses also support ENS names, which are automatically resolved to addresses.
+The server exposes blockchain data through the following MCP resource URIs.
 
 #### Blockchain Resources
 
-| Resource URI Pattern                        | Description                              |
-| ------------------------------------------- | ---------------------------------------- |
-| `evm://{network}/chain`                     | Chain information for a specific network |
-| `evm://chain`                               | Ethereum mainnet chain information       |
-| `evm://{network}/block/{blockNumber}`       | Block data by number                     |
-| `evm://{network}/block/latest`              | Latest block data                        |
-| `evm://{network}/address/{address}/balance` | Native token balance                     |
-| `evm://{network}/tx/{txHash}`               | Transaction details                      |
-| `evm://{network}/tx/{txHash}/receipt`       | Transaction receipt with logs            |
+| Resource URI Pattern                         | Description                              |
+| -------------------------------------------- | ---------------------------------------- |
+| `tron://{network}/chain`                     | Chain information for a specific network |
+| `tron://chain`                               | TRON mainnet chain information           |
+| `tron://{network}/block/{blockNumber}`       | Block data by number                     |
+| `tron://{network}/block/latest`              | Latest block data                        |
+| `tron://{network}/address/{address}/balance` | Native token balance                     |
+| `tron://{network}/tx/{txHash}`               | Transaction details                      |
+| `tron://{network}/tx/{txHash}/receipt`       | Transaction receipt with logs            |
 
 #### Token Resources
 
-| Resource URI Pattern                                                   | Description                    |
-| ---------------------------------------------------------------------- | ------------------------------ |
-| `evm://{network}/token/{tokenAddress}`                                 | ERC20 token information        |
-| `evm://{network}/token/{tokenAddress}/balanceOf/{address}`             | ERC20 token balance            |
-| `evm://{network}/nft/{tokenAddress}/{tokenId}`                         | NFT (ERC721) token information |
-| `evm://{network}/nft/{tokenAddress}/{tokenId}/isOwnedBy/{address}`     | NFT ownership verification     |
-| `evm://{network}/erc1155/{tokenAddress}/{tokenId}/uri`                 | ERC1155 token URI              |
-| `evm://{network}/erc1155/{tokenAddress}/{tokenId}/balanceOf/{address}` | ERC1155 token balance          |
+| Resource URI Pattern                                                    | Description                     |
+| ----------------------------------------------------------------------- | ------------------------------- |
+| `tron://{network}/token/{tokenAddress}`                                 | TRC20 token information         |
+| `tron://{network}/token/{tokenAddress}/balanceOf/{address}`             | TRC20 token balance             |
+| `tron://{network}/nft/{tokenAddress}/{tokenId}`                         | NFT (TRC721) token information  |
+| `tron://{network}/nft/{tokenAddress}/{tokenId}/isOwnedBy/{address}`     | NFT ownership verification      |
+| `tron://{network}/trc1155/{tokenAddress}/{tokenId}/uri`                 | TRC1155 token URI               |
+| `tron://{network}/trc1155/{tokenAddress}/{tokenId}/balanceOf/{address}` | TRC1155 token balance           |
 
 ## 🔒 Security Considerations
 
@@ -628,7 +545,7 @@ The server exposes blockchain data through the following MCP resource URIs. All 
 ## 📁 Project Structure
 
 ```
-mcp-evm-server/
+tron-mcp-server/
 ├── src/
 │   ├── index.ts                # Main stdio server entry point
 │   ├── server/                 # Server-related files

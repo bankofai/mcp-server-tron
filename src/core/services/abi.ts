@@ -2,8 +2,8 @@ import { type Address } from 'viem';
 import { resolveChainId, getSupportedNetworks } from '../chains.js';
 
 /**
- * Fetch contract ABI from Etherscan v2 API (unified endpoint for all EVM chains)
- * Requires ETHERSCAN_API_KEY environment variable to be set
+ * Fetch contract ABI from Tronscan API (unified endpoint for TRON chains)
+ * Requires TRONSCAN_API_KEY environment variable to be set
  *
  * @param contractAddress The contract address to fetch ABI for
  * @param network The network name or chain ID
@@ -11,11 +11,11 @@ import { resolveChainId, getSupportedNetworks } from '../chains.js';
  */
 export async function fetchContractABI(
   contractAddress: Address,
-  network: string = 'ethereum'
+  network: string = 'mainnet'
 ): Promise<string> {
-  const apiKey = process.env.ETHERSCAN_API_KEY;
+  const apiKey = process.env.TRONSCAN_API_KEY;
   if (!apiKey) {
-    throw new Error('ETHERSCAN_API_KEY environment variable is not set. Set it to fetch contract ABIs from block explorers.');
+    throw new Error('TRONSCAN_API_KEY environment variable is not set. Set it to fetch contract ABIs from block explorers.');
   }
 
   // Resolve chain ID using the chains.ts utilities
@@ -28,8 +28,8 @@ export async function fetchContractABI(
   }
 
   try {
-    // Use unified Etherscan v2 API endpoint
-    const url = new URL('https://api.etherscan.io/v2/api');
+    // Use Tronscan API endpoint
+    const url = new URL('https://apilist.tronscan.org/api/contract');
     url.searchParams.set('module', 'contract');
     url.searchParams.set('action', 'getabi');
     url.searchParams.set('address', contractAddress);

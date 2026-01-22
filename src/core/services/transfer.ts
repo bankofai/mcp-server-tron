@@ -13,8 +13,8 @@ import { getPublicClient, getWalletClient } from './clients.js';
 import { getChain } from '../chains.js';
 import { resolveAddress } from './ens.js';
 
-// Standard ERC20 ABI for transfers
-const erc20TransferAbi = [
+// Standard TRC20 ABI for transfers
+const trc20TransferAbi = [
   {
     inputs: [
       { type: 'address', name: 'to' },
@@ -51,8 +51,8 @@ const erc20TransferAbi = [
   }
 ] as const;
 
-// Standard ERC721 ABI for transfers
-const erc721TransferAbi = [
+// Standard TRC721 ABI for transfers
+const trc721TransferAbi = [
   {
     inputs: [
       { type: 'address', name: 'from' },
@@ -87,8 +87,8 @@ const erc721TransferAbi = [
   }
 ] as const;
 
-// ERC1155 ABI for transfers
-const erc1155TransferAbi = [
+// TRC1155 ABI for transfers
+const trc1155TransferAbi = [
   {
     inputs: [
       { type: 'address', name: 'from' },
@@ -148,7 +148,7 @@ export async function transferETH(
 }
 
 /**
- * Transfer ERC20 tokens to an address
+ * Transfer TRC20 tokens to an address
  * @param tokenAddressOrEns Token contract address or ENS name
  * @param toAddressOrEns Recipient address or ENS name
  * @param amount Amount to send (in token units)
@@ -156,7 +156,7 @@ export async function transferETH(
  * @param network Network name or chain ID
  * @returns Transaction details
  */
-export async function transferERC20(
+export async function transferTRC20(
   tokenAddressOrEns: string,
   toAddressOrEns: string,
   amount: string,
@@ -186,7 +186,7 @@ export async function transferERC20(
   const publicClient = getPublicClient(network);
   const contract = getContract({
     address: tokenAddress,
-    abi: erc20TransferAbi,
+    abi: trc20TransferAbi,
     client: publicClient,
   });
   
@@ -203,7 +203,7 @@ export async function transferERC20(
   // Send the transaction
   const hash = await walletClient.writeContract({
     address: tokenAddress,
-    abi: erc20TransferAbi,
+    abi: trc20TransferAbi,
     functionName: 'transfer',
     args: [toAddress, rawAmount],
     account: walletClient.account!,
@@ -224,7 +224,7 @@ export async function transferERC20(
 }
 
 /**
- * Approve ERC20 token spending
+ * Approve TRC20 token spending
  * @param tokenAddressOrEns Token contract address or ENS name
  * @param spenderAddressOrEns Spender address or ENS name
  * @param amount Amount to approve (in token units)
@@ -232,7 +232,7 @@ export async function transferERC20(
  * @param network Network name or chain ID
  * @returns Transaction details
  */
-export async function approveERC20(
+export async function approveTRC20(
   tokenAddressOrEns: string,
   spenderAddressOrEns: string,
   amount: string,
@@ -262,7 +262,7 @@ export async function approveERC20(
   const publicClient = getPublicClient(network);
   const contract = getContract({
     address: tokenAddress,
-    abi: erc20TransferAbi,
+    abi: trc20TransferAbi,
     client: publicClient,
   });
   
@@ -279,7 +279,7 @@ export async function approveERC20(
   // Send the transaction
   const hash = await walletClient.writeContract({
     address: tokenAddress,
-    abi: erc20TransferAbi,
+    abi: trc20TransferAbi,
     functionName: 'approve',
     args: [spenderAddress, rawAmount],
     account: walletClient.account!,
@@ -300,7 +300,7 @@ export async function approveERC20(
 }
 
 /**
- * Transfer an NFT (ERC721) to an address
+ * Transfer an NFT (TRC721) to an address
  * @param tokenAddressOrEns NFT contract address or ENS name
  * @param toAddressOrEns Recipient address or ENS name
  * @param tokenId Token ID to transfer
@@ -308,7 +308,7 @@ export async function approveERC20(
  * @param network Network name or chain ID
  * @returns Transaction details
  */
-export async function transferERC721(
+export async function transferTRC721(
   tokenAddressOrEns: string,
   toAddressOrEns: string,
   tokenId: bigint,
@@ -338,7 +338,7 @@ export async function transferERC721(
   // Send the transaction
   const hash = await walletClient.writeContract({
     address: tokenAddress,
-    abi: erc721TransferAbi,
+    abi: trc721TransferAbi,
     functionName: 'transferFrom',
     args: [fromAddress, toAddress, tokenId],
     account: walletClient.account!,
@@ -349,7 +349,7 @@ export async function transferERC721(
   const publicClient = getPublicClient(network);
   const contract = getContract({
     address: tokenAddress,
-    abi: erc721TransferAbi,
+    abi: trc721TransferAbi,
     client: publicClient,
   });
   
@@ -377,7 +377,7 @@ export async function transferERC721(
 }
 
 /**
- * Transfer ERC1155 tokens to an address
+ * Transfer TRC1155 tokens to an address
  * @param tokenAddressOrEns Token contract address or ENS name
  * @param toAddressOrEns Recipient address or ENS name
  * @param tokenId Token ID to transfer
@@ -386,7 +386,7 @@ export async function transferERC721(
  * @param network Network name or chain ID
  * @returns Transaction details
  */
-export async function transferERC1155(
+export async function transferTRC1155(
   tokenAddressOrEns: string,
   toAddressOrEns: string,
   tokenId: bigint,
@@ -417,7 +417,7 @@ export async function transferERC1155(
   // Send the transaction
   const hash = await walletClient.writeContract({
     address: tokenAddress,
-    abi: erc1155TransferAbi,
+    abi: trc1155TransferAbi,
     functionName: 'safeTransferFrom',
     args: [fromAddress, toAddress, tokenId, amountBigInt, '0x'],
     account: walletClient.account!,

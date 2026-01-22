@@ -1,5 +1,5 @@
 {
-  "name": "@anthropic/tron-mcp-server",
+  "name": "@sun-protocol/tron-mcp-server",
   "module": "src/index.ts",
   "type": "module",
   "version": "1.0.0",

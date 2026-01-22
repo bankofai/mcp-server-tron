@@ -7,8 +7,8 @@ import {
 } from 'viem';
 import { getPublicClient } from './clients.js';
 
-// Standard ERC20 ABI (minimal for reading)
-const erc20Abi = [
+// Standard TRC20 ABI (minimal for reading)
+const trc20Abi = [
   {
     inputs: [],
     name: 'name',
@@ -39,8 +39,8 @@ const erc20Abi = [
   }
 ] as const;
 
-// Standard ERC721 ABI (minimal for reading)
-const erc721Abi = [
+// Standard TRC721 ABI (minimal for reading)
+const trc721Abi = [
   {
     inputs: [],
     name: 'name',
@@ -64,8 +64,8 @@ const erc721Abi = [
   }
 ] as const;
 
-// Standard ERC1155 ABI (minimal for reading)
-const erc1155Abi = [
+// Standard TRC1155 ABI (minimal for reading)
+const trc1155Abi = [
   {
     inputs: [{ type: 'uint256', name: 'id' }],
     name: 'uri',
@@ -76,11 +76,11 @@ const erc1155Abi = [
 ] as const;
 
 /**
- * Get ERC20 token information
+ * Get TRC20 token information
  */
-export async function getERC20TokenInfo(
+export async function getTRC20TokenInfo(
   tokenAddress: Address,
-  network: string = 'ethereum'
+  network: string = 'mainnet'
 ): Promise<{
   name: string;
   symbol: string;
@@ -92,7 +92,7 @@ export async function getERC20TokenInfo(
 
   const contract = getContract({
     address: tokenAddress,
-    abi: erc20Abi,
+    abi: trc20Abi,
     client: publicClient,
   });
 
@@ -113,12 +113,12 @@ export async function getERC20TokenInfo(
 }
 
 /**
- * Get ERC721 token metadata
+ * Get TRC721 token metadata
  */
-export async function getERC721TokenMetadata(
+export async function getTRC721TokenMetadata(
   tokenAddress: Address,
   tokenId: bigint,
-  network: string = 'ethereum'
+  network: string = 'mainnet'
 ): Promise<{
   name: string;
   symbol: string;
@@ -128,7 +128,7 @@ export async function getERC721TokenMetadata(
 
   const contract = getContract({
     address: tokenAddress,
-    abi: erc721Abi,
+    abi: trc721Abi,
     client: publicClient,
   });
 
@@ -146,18 +146,18 @@ export async function getERC721TokenMetadata(
 }
 
 /**
- * Get ERC1155 token URI
+ * Get TRC1155 token URI
  */
-export async function getERC1155TokenURI(
+export async function getTRC1155TokenURI(
   tokenAddress: Address,
   tokenId: bigint,
-  network: string = 'ethereum'
+  network: string = 'mainnet'
 ): Promise<string> {
   const publicClient = getPublicClient(network);
 
   const contract = getContract({
     address: tokenAddress,
-    abi: erc1155Abi,
+    abi: trc1155Abi,
     client: publicClient,
   });
 

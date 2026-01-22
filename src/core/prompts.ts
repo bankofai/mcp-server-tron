@@ -15,7 +15,7 @@ import { z } from "zod";
  *
  * @param server The MCP server instance
  */
-export function registerEVMPrompts(server: McpServer) {
+export function registerTRONPrompts(server: McpServer) {
   // ============================================================================
   // TRANSACTION PROMPTS
   // ============================================================================
@@ -25,11 +25,11 @@ export function registerEVMPrompts(server: McpServer) {
     {
       description: "Safely prepare and execute a token transfer with validation checks",
       argsSchema: {
-        tokenType: z.enum(["native", "erc20"]).describe("Token type: 'native' for ETH/MATIC or 'erc20' for contract tokens"),
-        recipient: z.string().describe("Recipient address or ENS name"),
-        amount: z.string().describe("Amount to transfer (in ether for native, token units for ERC20)"),
-        network: z.string().optional().describe("Network name (default: ethereum)"),
-        tokenAddress: z.string().optional().describe("Token contract address (required for ERC20)")
+        tokenType: z.enum(["native", "trc20"]).describe("Token type: 'native' for TRX or 'trc20' for contract tokens"),
+        recipient: z.string().describe("Recipient address"),
+        amount: z.string().describe("Amount to transfer (in sun for native, token units for TRC20)"),
+        network: z.string().optional().describe("Network name (default: mainnet)"),
+        tokenAddress: z.string().optional().describe("Token contract address (required for TRC20)")
       }
     },
     ({ tokenType, recipient, amount, network = "ethereum", tokenAddress }) => ({
@@ -39,7 +39,7 @@ export function registerEVMPrompts(server: McpServer) {
           type: "text",
           text: `# Token Transfer Task
 
-**Objective**: Safely transfer ${amount} ${tokenType === "native" ? "native tokens" : "ERC20 tokens"} to ${recipient} on ${network}
+**Objective**: Safely transfer ${amount} ${tokenType === "native" ? "native tokens" : "TRC20 tokens"} to ${recipient} on ${network}
 
 ## Validation & Checks
 Before executing any transfer:
@@ -48,8 +48,8 @@ Before executing any transfer:
    ${tokenType === "native"
               ? "- Call `get_balance` to verify native token balance"
               : "- Call `get_token_balance` with tokenAddress=${tokenAddress} to verify balance"}
-3. **Gas Analysis**: Call \`get_gas_price\` to assess current network costs
-${tokenType === "erc20" ? `4. **Approval Check**: Call \`get_allowance\` to verify approval (if needed for protocols)` : ""}
+3. **Energy Analysis**: Call \`get_gas_price\` to assess current network costs
+${tokenType === "trc20" ? `4. **Approval Check**: Call \`get_allowance\` to verify approval (if needed for protocols)` : ""}
 
 ## Execution Steps
 ${tokenType === "native" ? `
@@ -64,7 +64,7 @@ ${tokenType === "native" ? `
    - Then proceed with transfer
 2. Summarize: sender, recipient, token, amount, decimals, gas estimate
 3. Request confirmation
-4. Call \`transfer_erc20\` with tokenAddress, recipient, amount
+4. Call \`transfer_trc20\` with tokenAddress, recipient, amount
 5. Wait for confirmation with \`wait_for_transaction\`
 `}
 
@@ -360,9 +360,9 @@ For each spender:
 **Objective**: Retrieve and analyze contract ABI from block explorer
 
 ## Prerequisites
-- Contract must be verified on block explorer (Etherscan/Polygonscan/etc)
-- ETHERSCAN_API_KEY environment variable required
-- Supports 30+ EVM networks via unified Etherscan v2 API
+- Contract must be verified on block explorer (Tronscan/etc)
+- TRONSCAN_API_KEY environment variable required
+- Supports TRON networks via unified Tronscan API
 - Read-only, no gas cost
 
 ## Fetching Process
@@ -423,7 +423,7 @@ Look for:
 - **Access Controls**: Who can call what?
 - **Special Functions**: Initialization, upgrade paths
 - **Obvious Issues**: Reentrancy risks, overflow/underflow patterns
-- **Standard Compliance**: Is it ERC20/721/1155 compatible?
+- **Standard Compliance**: Is it TRC20/721/1155 compatible?
 
 ## Output Format
 
@@ -460,7 +460,7 @@ Look for:
       argsSchema: {
         contractAddress: z.string().describe("Contract address to explore"),
         network: z.string().optional().describe("Network name (default: ethereum)"),
-        fetchAbi: z.string().optional().describe("Set to 'true' to auto-fetch ABI (requires ETHERSCAN_API_KEY)")
+        fetchAbi: z.string().optional().describe("Set to 'true' to auto-fetch ABI (requires TRONSCAN_API_KEY)")
       }
     },
     ({ contractAddress, network = "ethereum", fetchAbi }) => ({
@@ -495,8 +495,8 @@ ${fetchAbi === 'true'
 ### 1. Identify Contract Type
 Based on available functions, determine:
 - **Token**: Has name, symbol, decimals, totalSupply, balanceOf
-- **NFT/ERC721**: Has tokenURI, ownerOf, name, symbol
-- **NFT/ERC1155**: Has uri, balanceOf, balanceOfBatch
+- **NFT/TRC721**: Has tokenURI, ownerOf, name, symbol
+- **NFT/TRC1155**: Has uri, balanceOf, balanceOfBatch
 - **Staking**: Has stake, unstake, reward, claim functions
 - **DEX**: Has swap, liquidity, pair functions
 - **Other**: Analyze unique functions
@@ -505,12 +505,12 @@ Based on available functions, determine:
 
 For each contract type:
 
-**Token (ERC20)**:
+**Token (TRC20)**:
 - name, symbol, decimals, totalSupply
 - If owner, supply cap, minting rules
 - If tax/fee mechanism
 
-**NFT (ERC721)**:
+**NFT (TRC721)**:
 - name, symbol, totalSupply
 - baseURI, tokenURI patterns
 - royalty info if available
@@ -741,9 +741,9 @@ For a token mint operation:
   );
 
   server.registerPrompt(
-    "explain_evm_concept",
+    "explain_tron_concept",
     {
-      description: "Explain EVM and blockchain concepts with examples",
+      description: "Explain TRON and blockchain concepts with examples",
       argsSchema: {
         concept: z.string().describe("Concept to explain (gas, nonce, smart contracts, MEV, etc)")
       }
@@ -821,7 +821,7 @@ Provide explanation in sections:
   server.registerPrompt(
     "compare_networks",
     {
-      description: "Compare multiple EVM networks on key metrics and characteristics",
+      description: "Compare multiple TRON networks on key metrics and characteristics",
       argsSchema: {
         networks: z.string().describe("Comma-separated network names (ethereum,polygon,arbitrum)")
       }

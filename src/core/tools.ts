@@ -6,23 +6,23 @@ import { type Address, type Hex, type Hash } from 'viem';
 import { normalize } from 'viem/ens';
 
 /**
- * Register all EVM-related tools with the MCP server
+ * Register all TRON-related tools with the MCP server
  *
- * SECURITY: Either EVM_PRIVATE_KEY or EVM_MNEMONIC environment variable must be set for write operations.
+ * SECURITY: Either TRON_PRIVATE_KEY or TRON_MNEMONIC environment variable must be set for write operations.
  * Private keys and mnemonics are never passed as tool arguments for security reasons.
  * Tools will use the configured wallet for all transactions.
  *
  * Configuration options:
- * - EVM_PRIVATE_KEY: Hex private key (with or without 0x prefix)
- * - EVM_MNEMONIC: BIP-39 mnemonic phrase (12 or 24 words)
- * - EVM_ACCOUNT_INDEX: Optional account index for HD wallet derivation (default: 0)
+ * - TRON_PRIVATE_KEY: Hex private key (with or without 0x prefix)
+ * - TRON_MNEMONIC: BIP-39 mnemonic phrase (12 or 24 words)
+ * - TRON_ACCOUNT_INDEX: Optional account index for HD wallet derivation (default: 0)
  *
  * All tools that accept addresses also support ENS names (e.g., 'vitalik.eth').
  * ENS names are automatically resolved to addresses using the Ethereum Name Service.
  *
  * @param server The MCP server instance
  */
-export function registerEVMTools(server: McpServer) {
+export function registerTRONTools(server: McpServer) {
   // Helpers are now imported from services/wallet.ts
   const { getConfiguredPrivateKey, getWalletAddressFromKey, getConfiguredWallet } = services;
 
@@ -71,7 +71,7 @@ export function registerEVMTools(server: McpServer) {
   server.registerTool(
     "get_chain_info",
     {
-      description: "Get information about an EVM network: chain ID, current block number, and RPC endpoint",
+      description: "Get information about a TRON network: chain ID, current block number, and RPC endpoint",
       inputSchema: {
         network: z.string().optional().describe("Network name (e.g., 'ethereum', 'optimism', 'arbitrum', 'base') or chain ID. Defaults to Ethereum mainnet.")
       },
@@ -107,7 +107,7 @@ export function registerEVMTools(server: McpServer) {
   server.registerTool(
     "get_supported_networks",
     {
-      description: "Get a list of all supported EVM networks",
+      description: "Get a list of all supported TRON networks",
       inputSchema: {},
       annotations: {
         title: "Get Supported Networks",
@@ -355,9 +355,9 @@ export function registerEVMTools(server: McpServer) {
         openWorldHint: true
       }
     },
-    async ({ address, network = "ethereum" }) => {
+    async ({ address, network = "mainnet" }) => {
       try {
-        const balance = await services.getETHBalance(address as Address, network);
+        const balance = await services.getTRXBalance(address as Address, network);
         return {
           content: [{
             type: "text",
@@ -380,23 +380,23 @@ export function registerEVMTools(server: McpServer) {
   server.registerTool(
     "get_token_balance",
     {
-      description: "Get the ERC20 token balance for an address",
+      description: "Get the TRC20 token balance for an address",
       inputSchema: {
-        address: z.string().describe("The wallet address or ENS name"),
-        tokenAddress: z.string().describe("The ERC20 token contract address"),
-        network: z.string().optional().describe("Network name or chain ID. Defaults to Ethereum mainnet.")
+        address: z.string().describe("The wallet address"),
+        tokenAddress: z.string().describe("The TRC20 token contract address"),
+        network: z.string().optional().describe("Network name or chain ID. Defaults to TRON mainnet.")
       },
       annotations: {
-        title: "Get ERC20 Token Balance",
+        title: "Get TRC20 Token Balance",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
         openWorldHint: true
       }
     },
-    async ({ address, tokenAddress, network = "ethereum" }) => {
+    async ({ address, tokenAddress, network = "mainnet" }) => {
       try {
-        const balance = await services.getERC20Balance(tokenAddress as Address, address as Address, network);
+        const balance = await services.getTRC20Balance(tokenAddress as Address, address as Address, network);
         return {
           content: [{
             type: "text",
@@ -427,10 +427,10 @@ export function registerEVMTools(server: McpServer) {
     {
       description: "Check the allowance granted to a spender for a token. This tells you how much of a token an address can spend on your behalf.",
       inputSchema: {
-        tokenAddress: z.string().describe("The ERC20 token contract address"),
+        tokenAddress: z.string().describe("The TRC20 token contract address"),
         spenderAddress: z.string().describe("The address allowed to spend the token (usually a contract address)"),
         ownerAddress: z.string().optional().describe("The owner address (defaults to the configured wallet)"),
-        network: z.string().optional().describe("Network name or chain ID. Defaults to Ethereum mainnet.")
+        network: z.string().optional().describe("Network name or chain ID. Defaults to TRON mainnet.")
       },
       annotations: {
         title: "Get Token Allowance",
@@ -604,7 +604,7 @@ export function registerEVMTools(server: McpServer) {
   server.registerTool(
     "get_contract_abi",
     {
-      description: "Fetch a contract's full ABI from Etherscan/block explorers. Use this to understand verified contracts before interacting. Requires ETHERSCAN_API_KEY. Supports 30+ EVM networks. Works best with verified contracts on block explorers.",
+      description: "Fetch a contract's full ABI from Tronscan/block explorers. Use this to understand verified contracts before interacting. Requires TRONSCAN_API_KEY. Works best with verified contracts on block explorers.",
       inputSchema: {
         contractAddress: z.string().describe("The contract address (0x...)"),
         network: z.string().optional().describe("Network name or chain ID. Defaults to ethereum. Supported: ethereum, polygon, arbitrum, optimism, base, avalanche, gnosis, fantom, bsc, celo, scroll, linea, zksync, manta, blast, and testnets (sepolia, mumbai, arbitrum-sepolia, optimism-sepolia, base-sepolia, avalanche-fuji)")
@@ -648,13 +648,13 @@ export function registerEVMTools(server: McpServer) {
   server.registerTool(
     "read_contract",
     {
-      description: "Call read-only functions on a smart contract. Automatically fetches ABI from block explorer if not provided (requires ETHERSCAN_API_KEY). Falls back to common functions if contract is not verified. Use this to query contract state and data.",
+      description: "Call read-only functions on a smart contract. Automatically fetches ABI from block explorer if not provided (requires TRONSCAN_API_KEY). Falls back to common functions if contract is not verified. Use this to query contract state and data.",
       inputSchema: {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name (e.g., 'name', 'symbol', 'balanceOf', 'totalSupply', 'owner')"),
-        args: z.array(z.string()).optional().describe("Function arguments as strings (e.g., ['0xAddress'] for balanceOf)"),
+        args: z.array(z.string()).optional().describe("Function arguments as strings (e.g., ['TAddress'] for balanceOf)"),
         abiJson: z.string().optional().describe("Full contract ABI as JSON string (optional - will auto-fetch verified contract ABI if not provided)"),
-        network: z.string().optional().describe("Network name or chain ID. Defaults to Ethereum mainnet.")
+        network: z.string().optional().describe("Network name or chain ID. Defaults to TRON mainnet.")
       },
       annotations: {
         title: "Read Smart Contract",
@@ -753,14 +753,14 @@ export function registerEVMTools(server: McpServer) {
   server.registerTool(
     "write_contract",
     {
-      description: "Execute state-changing functions on a smart contract. Automatically fetches ABI from block explorer if not provided (requires ETHERSCAN_API_KEY). Use this to call any write function on verified contracts. Requires wallet to be configured (via private key or mnemonic).",
+      description: "Execute state-changing functions on a smart contract. Automatically fetches ABI from block explorer if not provided (requires TRONSCAN_API_KEY). Use this to call any write function on verified contracts. Requires wallet to be configured (via private key or mnemonic).",
       inputSchema: {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name to call (e.g., 'mint', 'swap', 'stake', 'approve')"),
-        args: z.array(z.string()).optional().describe("Function arguments as strings (e.g., ['0xAddress', '1000000'])"),
-        value: z.string().optional().describe("ETH value to send with transaction in ether (e.g., '0.1' for payable functions)"),
+        args: z.array(z.string()).optional().describe("Function arguments as strings (e.g., ['TAddress', '1000000'])"),
+        value: z.string().optional().describe("TRX value to send with transaction (e.g., '10' for payable functions)"),
         abiJson: z.string().optional().describe("Full contract ABI as JSON string (optional - will auto-fetch verified contract ABI if not provided)"),
-        network: z.string().optional().describe("Network name or chain ID. Defaults to Ethereum mainnet.")
+        network: z.string().optional().describe("Network name or chain ID. Defaults to TRON mainnet.")
       },
       annotations: {
         title: "Write to Smart Contract",
@@ -1036,28 +1036,28 @@ export function registerEVMTools(server: McpServer) {
   );
 
   server.registerTool(
-    "transfer_erc20",
+    "transfer_trc20",
     {
-      description: "Transfer ERC20 tokens to an address. Uses the configured wallet.",
+      description: "Transfer TRC20 tokens to an address. Uses the configured wallet.",
       inputSchema: {
-        tokenAddress: z.string().describe("The ERC20 token contract address"),
-        to: z.string().describe("Recipient address or ENS name"),
+        tokenAddress: z.string().describe("The TRC20 token contract address"),
+        to: z.string().describe("Recipient address"),
         amount: z.string().describe("Amount to send (in token units, accounting for decimals)"),
-        network: z.string().optional().describe("Network name or chain ID. Defaults to Ethereum mainnet.")
+        network: z.string().optional().describe("Network name or chain ID. Defaults to TRON mainnet.")
       },
       annotations: {
-        title: "Transfer ERC20 Tokens",
+        title: "Transfer TRC20 Tokens",
         readOnlyHint: false,
         destructiveHint: true,
         idempotentHint: false,
         openWorldHint: true
       }
     },
-    async ({ tokenAddress, to, amount, network = "ethereum" }) => {
+    async ({ tokenAddress, to, amount, network = "mainnet" }) => {
       try {
         const privateKey = getConfiguredPrivateKey();
         const senderAddress = getWalletAddressFromKey();
-        const result = await services.transferERC20(tokenAddress as Address, to as Address, amount, privateKey, network);
+        const result = await services.transferTRC20(tokenAddress as Address, to as Address, amount, privateKey, network);
         return {
           content: [{
             type: "text",
@@ -1076,7 +1076,7 @@ export function registerEVMTools(server: McpServer) {
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error transferring ERC20 tokens: ${error instanceof Error ? error.message : String(error)}` }],
+          content: [{ type: "text", text: `Error transferring TRC20 tokens: ${error instanceof Error ? error.message : String(error)}` }],
           isError: true
         };
       }
@@ -1088,10 +1088,10 @@ export function registerEVMTools(server: McpServer) {
     {
       description: "Approve a spender (contract) to spend tokens on your behalf. Required before interacting with DEXes, lending protocols, etc.",
       inputSchema: {
-        tokenAddress: z.string().describe("The ERC20 token contract address"),
+        tokenAddress: z.string().describe("The TRC20 token contract address"),
         spenderAddress: z.string().describe("The address that will be allowed to spend tokens (usually a contract)"),
         amount: z.string().describe("Amount to approve (in token units). Use '0' to revoke approval."),
-        network: z.string().optional().describe("Network name or chain ID. Defaults to Ethereum mainnet.")
+        network: z.string().optional().describe("Network name or chain ID. Defaults to TRON mainnet.")
       },
       annotations: {
         title: "Approve Token Spending",
@@ -1101,11 +1101,11 @@ export function registerEVMTools(server: McpServer) {
         openWorldHint: true
       }
     },
-    async ({ tokenAddress, spenderAddress, amount, network = "ethereum" }) => {
+    async ({ tokenAddress, spenderAddress, amount, network = "mainnet" }) => {
       try {
         const privateKey = getConfiguredPrivateKey();
         const senderAddress = getWalletAddressFromKey();
-        const txHash = await services.approveERC20(tokenAddress as Address, spenderAddress as Address, amount, privateKey, network);
+        const txHash = await services.approveTRC20(tokenAddress as Address, spenderAddress as Address, amount, privateKey, network);
         return {
           content: [{
             type: "text",
@@ -1136,11 +1136,11 @@ export function registerEVMTools(server: McpServer) {
   server.registerTool(
     "get_nft_info",
     {
-      description: "Get information about an ERC721 NFT including metadata URI",
+      description: "Get information about a TRC721 NFT including metadata URI",
       inputSchema: {
         contractAddress: z.string().describe("The NFT contract address"),
         tokenId: z.string().describe("The NFT token ID"),
-        network: z.string().optional().describe("Network name or chain ID. Defaults to Ethereum mainnet.")
+        network: z.string().optional().describe("Network name or chain ID. Defaults to TRON mainnet.")
       },
       annotations: {
         title: "Get NFT Info",
@@ -1150,9 +1150,9 @@ export function registerEVMTools(server: McpServer) {
         openWorldHint: true
       }
     },
-    async ({ contractAddress, tokenId, network = "ethereum" }) => {
+    async ({ contractAddress, tokenId, network = "mainnet" }) => {
       try {
-        const nftInfo = await services.getERC721TokenMetadata(contractAddress as Address, BigInt(tokenId), network);
+        const nftInfo = await services.getTRC721TokenMetadata(contractAddress as Address, BigInt(tokenId), network);
         return {
           content: [{
             type: "text",
@@ -1174,26 +1174,26 @@ export function registerEVMTools(server: McpServer) {
   );
 
   server.registerTool(
-    "get_erc1155_balance",
+    "get_trc1155_balance",
     {
-      description: "Get ERC1155 token balance for an address",
+      description: "Get TRC1155 token balance for an address",
       inputSchema: {
-        contractAddress: z.string().describe("The ERC1155 contract address"),
+        contractAddress: z.string().describe("The TRC1155 contract address"),
         tokenId: z.string().describe("The token ID"),
-        address: z.string().describe("The owner address or ENS name"),
-        network: z.string().optional().describe("Network name or chain ID. Defaults to Ethereum mainnet.")
+        address: z.string().describe("The owner address"),
+        network: z.string().optional().describe("Network name or chain ID. Defaults to TRON mainnet.")
       },
       annotations: {
-        title: "Get ERC1155 Balance",
+        title: "Get TRC1155 Balance",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
         openWorldHint: true
       }
     },
-    async ({ contractAddress, tokenId, address, network = "ethereum" }) => {
+    async ({ contractAddress, tokenId, address, network = "mainnet" }) => {
       try {
-        const balance = await services.getERC1155Balance(contractAddress as Address, address as Address, BigInt(tokenId), network);
+        const balance = await services.getTRC1155Balance(contractAddress as Address, address as Address, BigInt(tokenId), network);
         return {
           content: [{
             type: "text",
@@ -1208,7 +1208,7 @@ export function registerEVMTools(server: McpServer) {
         };
       } catch (error) {
         return {
-          content: [{ type: "text", text: `Error fetching ERC1155 balance: ${error instanceof Error ? error.message : String(error)}` }],
+          content: [{ type: "text", text: `Error fetching TRC1155 balance: ${error instanceof Error ? error.message : String(error)}` }],
           isError: true
         };
       }
