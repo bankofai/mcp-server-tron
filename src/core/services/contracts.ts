@@ -1,4 +1,3 @@
-import { TronWeb } from "tronweb";
 import { getTronWeb, getWallet } from "./clients.js";
 import { MULTICALL2_ABI, MULTICALL3_ABI } from "./multicall-abi.js";
 

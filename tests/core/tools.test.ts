@@ -122,7 +122,7 @@ describe("TRON Tools Unit Tests", () => {
 
     it("get_transaction should fetch tx details", async () => {
       (services.getTransaction as any).mockResolvedValue({ txID: "tx123" });
-      const result = await registeredTools.get("get_transaction").handler({ txHash: "tx123" });
+      await registeredTools.get("get_transaction").handler({ txHash: "tx123" });
       expect(services.getTransaction).toHaveBeenCalledWith("tx123", "mainnet");
     });
   });
