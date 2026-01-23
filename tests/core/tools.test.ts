@@ -161,13 +161,33 @@ describe("TRON Tools Unit Tests", () => {
       expect(content.result).toContain("result");
     });
 
-    it("multicall should execute batch calls", async () => {
+    it("multicall should execute batch calls and handle string version", async () => {
       (services.multicall as any).mockResolvedValue([{ success: true, result: "ok" }]);
       const result = await registeredTools.get("multicall").handler({
         calls: [{ address: "a", functionName: "f", abi: [] }],
+        version: "2",
       });
+      expect(services.multicall).toHaveBeenCalledWith(
+        expect.objectContaining({
+          version: 2,
+        }),
+        "mainnet",
+      );
       const content = JSON.parse(result.content[0].text);
       expect(content.results[0].result).toBe("ok");
+    });
+
+    it("multicall should use default version 3 if not provided", async () => {
+      (services.multicall as any).mockResolvedValue([{ success: true, result: "ok" }]);
+      await registeredTools.get("multicall").handler({
+        calls: [{ address: "a", functionName: "f", abi: [] }],
+      });
+      expect(services.multicall).toHaveBeenCalledWith(
+        expect.objectContaining({
+          version: 3,
+        }),
+        "mainnet",
+      );
     });
 
     it("transfer_trx should send signed transaction", async () => {

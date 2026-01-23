@@ -574,16 +574,12 @@ export function registerTRONTools(server: McpServer) {
           content: [
             {
               type: "text",
-              text: JSON.stringify(
-                {
-                  contractAddress,
-                  function: functionName,
-                  args: args.length > 0 ? args : undefined,
-                  result: services.helpers.formatJson(result),
-                },
-                null,
-                2,
-              ),
+              text: services.helpers.formatJson({
+                contractAddress,
+                function: functionName,
+                args: args.length > 0 ? args : undefined,
+                result,
+              }),
             },
           ],
         };
@@ -615,7 +611,9 @@ export function registerTRONTools(server: McpServer) {
                 .array(z.union([z.string(), z.number(), z.boolean()]))
                 .optional()
                 .describe("Function arguments"),
-              abi: z.array(z.any()).describe("Function ABI (required for multicall)"),
+              abi: z
+                .array(z.object({}).passthrough())
+                .describe("Function ABI (required for multicall)"),
               allowFailure: z
                 .boolean()
                 .optional()
@@ -629,7 +627,7 @@ export function registerTRONTools(server: McpServer) {
           .optional()
           .describe("Optional Multicall contract address override"),
         version: z
-          .union([z.literal(2), z.literal(3)])
+          .enum(["2", "3"])
           .optional()
           .describe("Multicall version (2 or 3). Defaults to 3."),
         allowFailure: z
@@ -645,8 +643,15 @@ export function registerTRONTools(server: McpServer) {
         openWorldHint: true,
       },
     },
-    async ({ calls, network = "mainnet", multicallAddress, version = 3, allowFailure = true }) => {
+    async ({
+      calls,
+      network = "mainnet",
+      multicallAddress,
+      version: versionArg,
+      allowFailure = true,
+    }) => {
       try {
+        const version = versionArg ? (parseInt(versionArg) as 2 | 3) : 3;
         const results = await services.multicall(
           {
             calls,
@@ -661,15 +666,11 @@ export function registerTRONTools(server: McpServer) {
           content: [
             {
               type: "text",
-              text: JSON.stringify(
-                {
-                  network,
-                  count: calls.length,
-                  results,
-                },
-                null,
-                2,
-              ),
+              text: services.helpers.formatJson({
+                network,
+                count: calls.length,
+                results,
+              }),
             },
           ],
         };
