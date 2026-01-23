@@ -137,6 +137,20 @@ npm start
 npm run start:http
 ```
 
+### Testing
+
+The project includes a comprehensive test suite with unit tests and integration tests (using the Nile network).
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test suites
+npx vitest tests/core/tools.test.ts          # Unit tests for tools
+npx vitest tests/core/services/multicall.test.ts # Multicall integration
+npx vitest tests/core/services/services.test.ts # Services integration
+```
+
 ### Connecting from Cursor / Claude Desktop
 
 Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude_desktop_config.json` or `.cursor/mcp.json`):
