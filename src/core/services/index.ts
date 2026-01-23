@@ -8,6 +8,7 @@ export * from "./contracts.js";
 export * from "./tokens.js";
 export * from "./address.js";
 export * from "./wallet.js";
+export * from "./multicall-abi.js";
 export * from "./utils.js"; // Export utils as top level as well
 
 // Add a helper object for easier access to everything

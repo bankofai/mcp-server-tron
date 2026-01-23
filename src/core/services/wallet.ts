@@ -101,12 +101,14 @@ export const getWalletAddressFromKey = (): string => {
  */
 export const signMessage = async (message: string): Promise<string> => {
   const { privateKey } = getConfiguredWallet();
+  const apiKey = process.env.TRONGRID_API_KEY;
 
   // Create a temporary TronWeb instance for signing (network doesn't matter for pure signing usually, but good practice)
   // Actually we can use TronWeb.Trx.signString equivalent if available statically, or instance.
   const tronWeb = new TronWeb({
     fullHost: "https://api.trongrid.io", // Dummy host for signing
     privateKey: privateKey,
+    headers: apiKey ? { "TRON-PRO-API-KEY": apiKey } : undefined,
   });
 
   // Sign the message
@@ -127,6 +129,7 @@ export const signTypedData = async (
   value: object,
 ): Promise<string> => {
   const { privateKey } = getConfiguredWallet();
+  const apiKey = process.env.TRONGRID_API_KEY;
 
   // TronWeb might support _signTypedData or similar.
   // For now, we'll use a generic implementation if TronWeb exposes it,
@@ -136,6 +139,7 @@ export const signTypedData = async (
   const tronWeb = new TronWeb({
     fullHost: "https://api.trongrid.io",
     privateKey: privateKey,
+    headers: apiKey ? { "TRON-PRO-API-KEY": apiKey } : undefined,
   });
 
   // @ts-ignore - TronWeb types might be missing signTypedData

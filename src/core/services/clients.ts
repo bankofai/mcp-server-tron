@@ -17,12 +17,17 @@ export function getTronWeb(network = "mainnet"): TronWeb {
 
   // Create a new client
   const config = getNetworkConfig(network);
+  const apiKey = process.env.TRONGRID_API_KEY;
 
   const client = new TronWeb({
     fullHost: config.fullNode,
     solidityNode: config.solidityNode,
     eventServer: config.eventServer,
+    headers: apiKey ? { "TRON-PRO-API-KEY": apiKey } : undefined,
   });
+
+  // Set a default address for read-only calls that might require it
+  client.setAddress("T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb");
 
   // Cache the client
   clientCache.set(cacheKey, client);
@@ -35,6 +40,7 @@ export function getTronWeb(network = "mainnet"): TronWeb {
  */
 export function getWallet(privateKey: string, network = "mainnet"): TronWeb {
   const config = getNetworkConfig(network);
+  const apiKey = process.env.TRONGRID_API_KEY;
 
   // TronWeb expects private key without 0x prefix usually, but handles it if present?
   // Let's strip 0x to be safe as TronWeb often prefers clean hex
@@ -45,5 +51,6 @@ export function getWallet(privateKey: string, network = "mainnet"): TronWeb {
     solidityNode: config.solidityNode,
     eventServer: config.eventServer,
     privateKey: cleanKey,
+    headers: apiKey ? { "TRON-PRO-API-KEY": apiKey } : undefined,
   });
 }

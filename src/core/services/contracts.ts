@@ -1,4 +1,6 @@
+import { TronWeb } from "tronweb";
 import { getTronWeb, getWallet } from "./clients.js";
+import { MULTICALL2_ABI, MULTICALL3_ABI } from "./multicall-abi.js";
 
 /**
  * Read from a smart contract (view/pure functions)
@@ -15,9 +17,6 @@ export async function readContract(
   const tronWeb = getTronWeb(network);
 
   try {
-    // If ABI provided, we might use it, but TronWeb .at() fetches it from chain usually.
-    // If we want to use specific ABI, we might need lower level calls or contract(abi, address)
-
     let contract;
     if (params.abi) {
       contract = tronWeb.contract(params.abi, params.address);
@@ -81,7 +80,7 @@ export async function writeContract(
 }
 
 /**
- * Fetch contract ABI from TronScan (or via TronWeb if verified)
+ * Fetch contract ABI via TronWeb (available for verified contracts)
  */
 export async function fetchContractABI(contractAddress: string, network = "mainnet") {
   const tronWeb = getTronWeb(network);
@@ -98,7 +97,6 @@ export async function fetchContractABI(contractAddress: string, network = "mainn
 
 /**
  * Parse ABI (helper to ensure correct format for TronWeb if needed)
- * TronWeb usually expects array of objects.
  */
 export function parseABI(abiJson: string | any[]): any[] {
   if (typeof abiJson === "string") {
@@ -136,29 +134,152 @@ export function getFunctionFromABI(abi: any[], functionName: string) {
 }
 
 /**
- * Multicall (Simulated/Native)
- * Tron has Multicall contracts deployed. We can try to find one or loop parallel calls.
- * Parallel calls are often "good enough" for MCP unless extremely heavy.
- * For this version, we will implement parallel execution wrapper as Multicall is not standard at one address on all Tron networks.
+ * Multicall (Simulated or Native Multicall2/3)
  */
 export async function multicall(
-  calls: Array<{
-    address: string;
-    functionName: string;
-    args?: any[];
-    abi?: any[];
-  }>,
-  _allowFailure = true,
+  params: {
+    calls: Array<{
+      address: string;
+      functionName: string;
+      args?: any[];
+      abi: any[];
+      allowFailure?: boolean;
+    }>;
+    multicallAddress?: string;
+    version?: 2 | 3;
+    allowFailure?: boolean;
+  },
   network = "mainnet",
 ) {
-  // Parallel execution
-  const results = await Promise.allSettled(calls.map((call) => readContract(call, network)));
+  const { calls, version = 3, allowFailure: globalAllowFailure = true } = params;
+  const mAddress = params.multicallAddress;
 
-  return results.map((result) => {
-    if (result.status === "fulfilled") {
-      return { status: "success", result: result.value };
-    } else {
-      return { status: "failure", error: result.reason };
-    }
-  });
+  const fallbackToSimulation = async (error?: string) => {
+    if (error) console.error(`Multicall failed, falling back to simulation: ${error}`);
+    const results = await Promise.allSettled(calls.map((call) => readContract(call, network)));
+    return results.map((result, idx) => {
+      if (result.status === "fulfilled") {
+        return { success: true, result: result.value };
+      } else {
+        return {
+          success: false,
+          error: `Call to ${calls[idx].functionName} failed: ${result.reason}`,
+        };
+      }
+    });
+  };
+
+  if (!mAddress) {
+    return fallbackToSimulation();
+  }
+
+  const tronWeb = getTronWeb(network);
+
+  try {
+    const callDataWithFuncs = calls.map((call) => {
+      const func = call.abi.find((i: any) => i.name === call.functionName && i.type === "function");
+      if (!func) {
+        throw new Error(`Function ${call.functionName} not found in ABI for ${call.address}`);
+      }
+
+      const inputs = func.inputs || [];
+      const types = inputs.map((i: any) => i.type);
+      const signature = `${call.functionName}(${types.join(",")})`;
+
+      const fullHash = tronWeb.sha3(signature);
+      const selector = fullHash.startsWith("0x")
+        ? fullHash.slice(0, 10)
+        : "0x" + fullHash.slice(0, 8);
+
+      const values = call.args || [];
+      const encodedArgs = (tronWeb as any).utils.abi.encodeParams(types, values).replace(/^0x/, "");
+      const callData = selector + encodedArgs;
+
+      const callAllowFailure =
+        call.allowFailure !== undefined ? call.allowFailure : globalAllowFailure;
+
+      return {
+        callData:
+          version === 3 ? [call.address, callAllowFailure, callData] : [call.address, callData],
+        func,
+      };
+    });
+
+    const encodedCalls = callDataWithFuncs.map((item) => item.callData);
+    const multicallAbi = version === 3 ? MULTICALL3_ABI : MULTICALL2_ABI;
+    const method = version === 3 ? "aggregate3" : "tryAggregate";
+    const multicallArgs = version === 3 ? [encodedCalls] : [!globalAllowFailure, encodedCalls];
+
+    const contract = tronWeb.contract(multicallAbi, mAddress);
+    const results = await (contract as any)[method](...multicallArgs).call();
+
+    // TronWeb might wrap the result array in another array
+    const finalResults =
+      Array.isArray(results) &&
+      results.length === 1 &&
+      Array.isArray(results[0]) &&
+      (Array.isArray(results[0][0]) || typeof results[0][0] === "object")
+        ? results[0]
+        : results;
+
+    return finalResults.map((res: any, index: number) => {
+      const success = res.success !== undefined ? res.success : res[0];
+      const returnData = res.returnData !== undefined ? res.returnData : res[1];
+
+      if (!success) {
+        return {
+          success: false,
+          error: `Call to ${calls[index].functionName} failed in multicall`,
+        };
+      }
+
+      const func = callDataWithFuncs[index].func;
+      const outputs = func.outputs || [];
+      const outputTypes = outputs.map((o: any) => o.type);
+      const outputNames = outputs.map((o: any) => o.name || "");
+
+      try {
+        const decoded = (tronWeb as any).utils.abi.decodeParams(
+          outputNames,
+          outputTypes,
+          returnData,
+          true,
+        );
+
+        let result: any;
+        if (outputTypes.length === 1) {
+          if (typeof decoded === "object" && !Array.isArray(decoded)) {
+            // TronWeb decodeParams returns an object with both index keys and named keys
+            // For example: { "0": 123n, "timestamp": 123n }
+            // We want to return the raw value if it's a single output,
+            // but we need to be careful if the user expects the object structure.
+            // MCP tools usually prefer the raw value for single outputs for simplicity.
+            const entries = Object.entries(decoded);
+            const namedEntry = entries.find(([k]) => isNaN(Number(k)) && k !== "");
+
+            // If it's a single output AND it has a name, we return the WHOLE object
+            // so results[0].result.timestamp works.
+            // If it has NO name (just "0"), we return the raw value.
+            if (namedEntry) {
+              result = decoded;
+            } else {
+              result = entries[0] ? entries[0][1] : decoded;
+            }
+          } else {
+            result = Array.isArray(decoded) && decoded.length === 1 ? decoded[0] : decoded;
+          }
+        } else {
+          result = decoded;
+        }
+        return { success: true, result };
+      } catch (e: any) {
+        return {
+          success: false,
+          error: `Failed to decode ${calls[index].functionName}: ${e.message}`,
+        };
+      }
+    });
+  } catch (error: any) {
+    return fallbackToSimulation(error.message);
+  }
 }

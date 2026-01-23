@@ -602,6 +602,92 @@ export function registerTRONTools(server: McpServer) {
   );
 
   server.registerTool(
+    "multicall",
+    {
+      description: "Execute multiple read-only functions in a single batch call.",
+      inputSchema: {
+        calls: z
+          .array(
+            z.object({
+              address: z.string().describe("Target contract address"),
+              functionName: z.string().describe("Function name"),
+              args: z
+                .array(z.union([z.string(), z.number(), z.boolean()]))
+                .optional()
+                .describe("Function arguments"),
+              abi: z.array(z.any()).describe("Function ABI (required for multicall)"),
+              allowFailure: z
+                .boolean()
+                .optional()
+                .describe("Whether to allow this specific call to fail"),
+            }),
+          )
+          .describe("Array of calls to execute"),
+        network: z.string().optional().describe("Network name. Defaults to mainnet."),
+        multicallAddress: z
+          .string()
+          .optional()
+          .describe("Optional Multicall contract address override"),
+        version: z
+          .union([z.literal(2), z.literal(3)])
+          .optional()
+          .describe("Multicall version (2 or 3). Defaults to 3."),
+        allowFailure: z
+          .boolean()
+          .optional()
+          .describe("Whether to allow individual calls to fail. Defaults to true."),
+      },
+      annotations: {
+        title: "Multicall",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async ({ calls, network = "mainnet", multicallAddress, version = 3, allowFailure = true }) => {
+      try {
+        const results = await services.multicall(
+          {
+            calls,
+            multicallAddress,
+            version: version,
+            allowFailure,
+          },
+          network,
+        );
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  network,
+                  count: calls.length,
+                  results,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error executing multicall: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    },
+  );
+
+  server.registerTool(
     "write_contract",
     {
       description:

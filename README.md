@@ -8,7 +8,7 @@
 
 A comprehensive Model Context Protocol (MCP) server that provides blockchain services for the TRON network. This server enables AI agents to interact with TRON blockchain with a unified interface through tools and AI-guided prompts for TRX, TRC20 tokens and smart contracts.
 
-## 📋 Contents
+## Contents
 
 - [Overview](#overview)
 - [Features](#features)
@@ -24,10 +24,9 @@ A comprehensive Model Context Protocol (MCP) server that provides blockchain ser
   - [Prompts](#prompts)
 - [Security Considerations](#security-considerations)
 - [Project Structure](#project-structure)
-- [Development](#development)
 - [License](#license)
 
-## 🔭 Overview
+## Overview
 
 The MCP TRON Server leverages the Model Context Protocol to provide blockchain services to AI agents. It fully supports the TRON ecosystem using `tronweb`.
 
@@ -40,7 +39,7 @@ Key capabilities:
 - **Wallet Integration**: Support for Private Key and Mnemonic (BIP-39) wallets.
 - **Multi-Network**: Seamless support for Mainnet, Nile, and Shasta.
 
-## ✨ Features
+## Features
 
 ### Blockchain Data Access
 
@@ -67,7 +66,7 @@ Key capabilities:
 
 - **Read Contract**: Call `view` and `pure` functions.
 - **Write Contract**: Execute state-changing functions.
-- **ABI Fetching**: (Future/Planned) Fetch ABI from block explorers.
+- **ABI Fetching**: Automatically fetches ABI from the blockchain for verified contracts.
 
 ### Wallet & Security
 
@@ -75,18 +74,18 @@ Key capabilities:
 - **HD Wallet**: Supports BIP-44 derivation path `m/44'/195'/0'/0/{index}`.
 - **Signing**: Sign arbitrary messages.
 
-## 🌐 Supported Networks
+## Supported Networks
 
 - **Mainnet**: `mainnet` (Default)
 - **Nile Testnet**: `nile`
 - **Shasta Testnet**: `shasta`
 
-## 🛠️ Prerequisites
+## Prerequisites
 
 - [Node.js](https://nodejs.org/) 20.0.0 or higher
-- Optional: [Tronscan API key](https://tronscan.org/) for ABI fetching
+- Optional: [TronGrid API key](https://www.trongrid.io/) to avoid rate limiting on Mainnet.
 
-## 📦 Installation
+## Installation
 
 ```bash
 # Clone the repository
@@ -97,11 +96,15 @@ cd tron-mcp-server
 npm install
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
-To enable write operations (transfers, contract calls), you must configure a wallet.
+To enable write operations (transfers, contract calls) and ensure reliable API access, you should configure the following variables.
+
+#### Network Configuration
+
+- `TRONGRID_API_KEY`: (Optional) Your TronGrid API key. Highly recommended for Mainnet to avoid frequency limits.
 
 #### Wallet Configuration
 
@@ -122,7 +125,7 @@ export TRON_ACCOUNT_INDEX="0" # Optional, default: 0
 
 The server runs on port **3001** by default in HTTP mode.
 
-## 🚀 Usage
+## Usage
 
 ### Running Locally
 
@@ -147,7 +150,8 @@ Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude
       "command": "npx",
       "args": ["tsx", "/ABSOLUTE/PATH/TO/tron-mcp-server/src/index.ts"],
       "env": {
-        "TRON_PRIVATE_KEY": "your_private_key_hex"
+        "TRON_PRIVATE_KEY": "your_private_key_hex",
+        "TRONGRID_API_KEY": "your_trongrid_api_key"
       }
     }
   }
@@ -163,14 +167,15 @@ Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude
       "command": "npx",
       "args": ["-y", "@sun-protocol/tron-mcp-server"],
       "env": {
-        "TRON_PRIVATE_KEY": "your_private_key_hex"
+        "TRON_PRIVATE_KEY": "your_private_key_hex",
+        "TRONGRID_API_KEY": "your_trongrid_api_key"
       }
     }
   }
 }
 ```
 
-## 📚 API Reference
+## API Reference
 
 ### Tools
 
@@ -205,6 +210,7 @@ Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude
 #### Smart Contracts
 
 - `read_contract`: Call read-only contract functions.
+- `multicall`: Execute multiple read-only functions in a single batch call.
 - `write_contract`: Call state-changing contract functions.
 
 #### Signing
@@ -218,13 +224,13 @@ Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude
 - `analyze_wallet`: Comprehensive report of wallet assets.
 - `check_network_status`: Report on network health and resource costs.
 
-## 🔒 Security Considerations
+## Security Considerations
 
 - **Private Keys**: Never share your private keys. Use environment variables.
 - **Testnets**: Always test on Nile or Shasta before performing operations on Mainnet.
 - **Approvals**: Be cautious when approving token allowances via `write_contract`.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 tron-mcp-server/
@@ -245,6 +251,6 @@ tron-mcp-server/
 └── package.json
 ```
 
-## 📄 License
+## License
 
 MIT
