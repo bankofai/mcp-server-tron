@@ -2,7 +2,7 @@
   "name": "@sun-protocol/tron-mcp-server",
   "module": "src/index.ts",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server for interacting with TRON blockchain - supports tools and prompts for TRX, TRC20, TRC721 tokens and smart contracts",
   "bin": {
     "tron-mcp-server": "./bin/cli.js"
