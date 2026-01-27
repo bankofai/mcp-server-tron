@@ -22,6 +22,14 @@ jobs:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org/"
 
+      - name: Check and Update npm
+        run: |
+          echo "Initial npm version:"
+          npm --version
+          npm install -g npm@latest
+          echo "Updated npm version:"
+          npm --version
+
       - name: Install dependencies
         run: npm install
 
