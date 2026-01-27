@@ -27,5 +27,9 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 mcp-context/
 build/
 
+# Package Lock & Release Notes
+package-lock.json
+RELEASE_NOTES.md
+
 # Finder (MacOS) folder config
 .DS_Store
