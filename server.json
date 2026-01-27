@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.sun-protocol/tron-mcp-server",
+  "description": "MCP server for interacting with TRON blockchain - supports tools and prompts for TRX, TRC20, TRC721 tokens and smart contracts",
+  "repository": {
+    "url": "https://github.com/sun-protocol/tron-mcp-server",
+    "source": "github"
+  },
+  "version": "1.1.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@sun-protocol/tron-mcp-server",
+      "version": "1.1.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "TRON_PRIVATE_KEY",
+          "description": "Private key for the TRON wallet (optional, for write operations)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true
+        },
+        {
+          "name": "TRONGRID_API_KEY",
+          "description": "TronGrid API Key for higher rate limits (optional)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

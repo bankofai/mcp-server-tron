@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2026-01-27
+
+### Changed
+
+- Added `mcpName` to `package.json` for MCP Registry verification.
+
 ## [1.1.0] - 2026-01-27
 
 ### Added
