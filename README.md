@@ -160,34 +160,25 @@ npx vitest tests/core/services/multicall.test.ts # Multicall integration
 npx vitest tests/core/services/services.test.ts # Services integration
 ```
 
-### Connecting from Cursor / Claude Desktop / Google Antigravity
+### Client Configuration
 
-Add the following to your MCP configuration file:
+To use this server with MCP clients like Claude Desktop, Cursor, or Google Antigravity, you need to add it to your configuration file.
 
-- **Claude Desktop**: `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows)
-- **Cursor**: `.cursor/mcp.json`
-- **Google Antigravity**: `~/.config/antigravity/mcp.json`
+#### 1. Locate your Configuration File
 
-**Important**: We recommend omitting the `env` section if you have already set these variables in your system environment. If your MCP client doesn't inherit system variables, use placeholders or ensure the config file is not shared or committed to version control.
+| Application            | OS      | Config Path                                                       |
+| :--------------------- | :------ | :---------------------------------------------------------------- |
+| **Claude Desktop**     | macOS   | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+|                        | Windows | `%APPDATA%\Claude\claude_desktop_config.json`                     |
+| **Cursor**             | All     | Project root: `.cursor/mcp.json`                                  |
+| **Google Antigravity** | All     | `~/.config/antigravity/mcp.json`                                  |
 
-**For local development (running from source):**
+#### 2. Add Server Definition
 
-```json
-{
-  "mcpServers": {
-    "tron-mcp-server": {
-      "command": "npx",
-      "args": ["tsx", "/ABSOLUTE/PATH/TO/tron-mcp-server/src/index.ts"],
-      "env": {
-        "TRON_PRIVATE_KEY": "<YOUR_PRIVATE_KEY_HERE>",
-        "TRONGRID_API_KEY": "<YOUR_TRONGRID_API_KEY_HERE>"
-      }
-    }
-  }
-}
-```
+Choose one of the following methods to add to your `mcpServers` object.
 
-**For using the built package (if installed globally or via npx):**
+**Option A: Quick Start (Recommended)**
+Runs the latest version directly from npm.
 
 ```json
 {
@@ -196,13 +187,33 @@ Add the following to your MCP configuration file:
       "command": "npx",
       "args": ["-y", "@sun-protocol/tron-mcp-server"],
       "env": {
-        "TRON_PRIVATE_KEY": "<YOUR_PRIVATE_KEY_HERE>",
-        "TRONGRID_API_KEY": "<YOUR_TRONGRID_API_KEY_HERE>"
+        "TRON_PRIVATE_KEY": "YOUR_KEY_HERE (Or set in system env)",
+        "TRONGRID_API_KEY": "YOUR_KEY_HERE (Or set in system env)"
       }
     }
   }
 }
 ```
+
+**Option B: Local Development**
+For developers running from the cloned repository.
+
+```json
+{
+  "mcpServers": {
+    "tron-mcp-server": {
+      "command": "npx",
+      "args": ["tsx", "/ABSOLUTE/PATH/TO/tron-mcp-server/src/index.ts"],
+      "env": {
+        "TRON_PRIVATE_KEY": "YOUR_KEY_HERE (Or set in system env)",
+        "TRONGRID_API_KEY": "YOUR_KEY_HERE (Or set in system env)"
+      }
+    }
+  }
+}
+```
+
+**Important**: We recommend omitting the `env` section if you have already set these variables in your system environment. If your MCP client doesn't inherit system variables, use placeholders or ensure the config file is not shared or committed to version control.
 
 ## API Reference
 
