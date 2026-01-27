@@ -1,43 +1,51 @@
-import { 
-  type Hash,
-  type Block
-} from 'viem';
-import { getPublicClient } from './clients.js';
+import { getTronWeb } from "./clients.js";
+
+// Define return types explicitly to avoid 'cannot be named' errors
+type Block = any; // TronWeb block type is complex, using any for now to resolve build error
 
 /**
- * Get the current block number for a specific network
+ * Get block details by block number or hash
  */
-export async function getBlockNumber(network = 'ethereum'): Promise<bigint> {
-  const client = getPublicClient(network);
-  return await client.getBlockNumber();
+export async function getBlockByNumber(blockNumber: number, network = "mainnet"): Promise<Block> {
+  const tronWeb = getTronWeb(network);
+  const block = await tronWeb.trx.getBlock(blockNumber);
+  return block;
+}
+
+export async function getBlockByHash(blockHash: string, network = "mainnet"): Promise<Block> {
+  const tronWeb = getTronWeb(network);
+  const block = await tronWeb.trx.getBlock(blockHash);
+  return block;
 }
 
 /**
- * Get a block by number for a specific network
+ * Get the latest block from the network
  */
-export async function getBlockByNumber(
-  blockNumber: number, 
-  network = 'ethereum'
-): Promise<Block> {
-  const client = getPublicClient(network);
-  return await client.getBlock({ blockNumber: BigInt(blockNumber) });
+export async function getLatestBlock(network = "mainnet"): Promise<Block> {
+  const tronWeb = getTronWeb(network);
+  const block = await tronWeb.trx.getCurrentBlock();
+  return block;
 }
 
 /**
- * Get a block by hash for a specific network
+ * Get current block number
  */
-export async function getBlockByHash(
-  blockHash: Hash, 
-  network = 'ethereum'
-): Promise<Block> {
-  const client = getPublicClient(network);
-  return await client.getBlock({ blockHash });
+export async function getBlockNumber(network = "mainnet"): Promise<number> {
+  const block = await getLatestBlock(network);
+  // Type assertion or checking structure; TronWeb block structure varies slightly by version/response
+  return (block as any).block_header.raw_data.number;
 }
 
-/**
- * Get the latest block for a specific network
- */
-export async function getLatestBlock(network = 'ethereum'): Promise<Block> {
-  const client = getPublicClient(network);
-  return await client.getBlock();
-} 
+// Chain ID is not standard in TronWeb like EVM, but we can return network ID or similar
+// For compatibility with tool interface
+export async function getChainId(network = "mainnet"): Promise<number> {
+  // Tron Mainnet ID is often considered 0x2b6653dc (hex) or similar in some contexts,
+  // but typically we just return a placeholder or specific known ID if needed.
+  // FullNode info might have it.
+
+  // For now, mapping known networks to some integer IDs if needed, or just return 0
+  if (network === "mainnet") return 728126428; // Tron Mainnet ID (often used)
+  if (network === "nile") return 20191029; // Nile ID
+  if (network === "shasta") return 1;
+  return 0;
+}

@@ -7,7 +7,7 @@ async function main() {
     const server = await startServer();
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error("EVM MCP Server running on stdio");
+    console.error("TRON MCP Server running on stdio");
   } catch (error) {
     console.error("Error starting MCP server:", error);
     process.exit(1);
@@ -17,4 +17,4 @@ async function main() {
 main().catch((error) => {
   console.error("Fatal error in main():", error);
   process.exit(1);
-}); 
+});

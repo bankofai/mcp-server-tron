@@ -1,19 +1,12 @@
 {
   "mcpServers": {
-    "evm-mcp-server": {
+    "tron-mcp-server": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@mcpdotdirect/evm-mcp-server"
-      ]
+      "args": ["-y", "@sun-protocol/tron-mcp-server"]
     },
-    "evm-mcp-http": {
+    "tron-mcp-http": {
       "command": "npx",
-      "args": [
-        "-y", 
-        "@mcpdotdirect/evm-mcp-server", 
-        "--http"
-      ]
+      "args": ["-y", "@sun-protocol/tron-mcp-server", "--http"]
     }
   }
-} 
+}

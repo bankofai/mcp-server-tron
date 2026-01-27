@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerEVMResources } from "../core/resources.js";
-import { registerEVMTools } from "../core/tools.js";
-import { registerEVMPrompts } from "../core/prompts.js";
+import { registerTRONResources } from "../core/resources.js";
+import { registerTRONTools } from "../core/tools.js";
+import { registerTRONPrompts } from "../core/prompts.js";
 import { getSupportedNetworks } from "../core/chains.js";
 
 // Create and start the MCP server
@@ -10,33 +10,33 @@ async function startServer() {
     // Create a new MCP server instance with capabilities
     const server = new McpServer(
       {
-        name: "evm-mcp-server",
-        version: "2.0.0"
+        name: "tron-mcp-server",
+        version: "2.0.0",
       },
       {
         capabilities: {
           tools: {
-            listChanged: true
+            listChanged: true,
           },
           resources: {
             subscribe: false,
-            listChanged: true
+            listChanged: true,
           },
           prompts: {
-            listChanged: true
+            listChanged: true,
           },
-          logging: {}
-        }
-      }
+          logging: {},
+        },
+      },
     );
 
     // Register all resources, tools, and prompts
-    registerEVMResources(server);
-    registerEVMTools(server);
-    registerEVMPrompts(server);
+    registerTRONResources(server);
+    registerTRONTools(server);
+    registerTRONPrompts(server);
 
     // Log server information
-    console.error(`EVM MCP Server v2.0.0 initialized`);
+    console.error(`TRON MCP Server v2.0.0 initialized`);
     console.error(`Protocol: MCP 2025-06-18`);
     console.error(`Supported networks: ${getSupportedNetworks().length} networks`);
     console.error("Server is ready to handle requests");

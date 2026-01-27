@@ -1,49 +1,56 @@
-import { 
-  type Address, 
-  type Hash, 
-  type TransactionReceipt,
-  type EstimateGasParameters
-} from 'viem';
-import { getPublicClient } from './clients.js';
+import { getTronWeb } from "./clients.js";
+
+type Transaction = any;
+type TransactionInfo = any;
 
 /**
- * Get a transaction by hash for a specific network
+ * Get transaction details by transaction hash
  */
-export async function getTransaction(hash: Hash, network = 'ethereum') {
-  const client = getPublicClient(network);
-  return await client.getTransaction({ hash });
+export async function getTransaction(txHash: string, network = "mainnet"): Promise<Transaction> {
+  const tronWeb = getTronWeb(network);
+  const tx = await tronWeb.trx.getTransaction(txHash);
+  return tx;
 }
 
 /**
- * Get a transaction receipt by hash for a specific network
+ * Get transaction info (receipt equivalent)
  */
-export async function getTransactionReceipt(hash: Hash, network = 'ethereum'): Promise<TransactionReceipt> {
-  const client = getPublicClient(network);
-  return await client.getTransactionReceipt({ hash });
+export async function getTransactionInfo(
+  txHash: string,
+  network = "mainnet",
+): Promise<TransactionInfo> {
+  const tronWeb = getTronWeb(network);
+  const info = await tronWeb.trx.getTransactionInfo(txHash);
+  return info;
 }
 
-/**
- * Get the transaction count for an address for a specific network
- */
-export async function getTransactionCount(address: Address, network = 'ethereum'): Promise<number> {
-  const client = getPublicClient(network);
-  const count = await client.getTransactionCount({ address });
-  return Number(count);
-}
+// Alias for tools expecting 'receipt'
+export const getTransactionReceipt = getTransactionInfo;
 
 /**
- * Estimate gas for a transaction for a specific network
+ * Wait for a transaction to be confirmed
  */
-export async function estimateGas(params: EstimateGasParameters, network = 'ethereum'): Promise<bigint> {
-  const client = getPublicClient(network);
-  return await client.estimateGas(params);
-}
+export async function waitForTransaction(
+  txHash: string,
+  network = "mainnet",
+): Promise<TransactionInfo> {
+  const tronWeb = getTronWeb(network);
 
-/**
- * Get the chain ID for a specific network
- */
-export async function getChainId(network = 'ethereum'): Promise<number> {
-  const client = getPublicClient(network);
-  const chainId = await client.getChainId();
-  return Number(chainId);
-} 
+  // Poll for transaction info
+  const maxAttempts = 30;
+  const interval = 2000; // 2 seconds
+
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      const info = await tronWeb.trx.getTransactionInfo(txHash);
+      if (info && info.id) {
+        return info;
+      }
+    } catch (_e) {
+      // Ignore error and retry
+    }
+    await new Promise((resolve) => setTimeout(resolve, interval));
+  }
+
+  throw new Error(`Transaction ${txHash} not confirmed after ${maxAttempts * interval}ms`);
+}

@@ -1,86 +1,11 @@
-import { 
-  type Address, 
-  type Hex,
-  type Hash,
-  formatUnits,
-  getContract
-} from 'viem';
-import { getPublicClient } from './clients.js';
-
-// Standard ERC20 ABI (minimal for reading)
-const erc20Abi = [
-  {
-    inputs: [],
-    name: 'name',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ type: 'uint8' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
-] as const;
-
-// Standard ERC721 ABI (minimal for reading)
-const erc721Abi = [
-  {
-    inputs: [],
-    name: 'name',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [{ type: 'uint256', name: 'tokenId' }],
-    name: 'tokenURI',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
-] as const;
-
-// Standard ERC1155 ABI (minimal for reading)
-const erc1155Abi = [
-  {
-    inputs: [{ type: 'uint256', name: 'id' }],
-    name: 'uri',
-    outputs: [{ type: 'string' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
-] as const;
+import { getTronWeb } from "./clients.js";
 
 /**
- * Get ERC20 token information
+ * Get TRC20 token information
  */
-export async function getERC20TokenInfo(
-  tokenAddress: Address,
-  network: string = 'ethereum'
+export async function getTRC20TokenInfo(
+  tokenAddress: string,
+  network: string = "mainnet",
 ): Promise<{
   name: string;
   symbol: string;
@@ -88,78 +13,85 @@ export async function getERC20TokenInfo(
   totalSupply: bigint;
   formattedTotalSupply: string;
 }> {
-  const publicClient = getPublicClient(network);
+  const tronWeb = getTronWeb(network);
 
-  const contract = getContract({
-    address: tokenAddress,
-    abi: erc20Abi,
-    client: publicClient,
-  });
+  try {
+    const contract = await tronWeb.contract().at(tokenAddress);
 
-  const [name, symbol, decimals, totalSupply] = await Promise.all([
-    contract.read.name(),
-    contract.read.symbol(),
-    contract.read.decimals(),
-    contract.read.totalSupply()
-  ]);
+    const [name, symbol, decimals, totalSupply] = await Promise.all([
+      contract.methods.name().call(),
+      contract.methods.symbol().call(),
+      contract.methods.decimals().call(),
+      contract.methods.totalSupply().call(),
+    ]);
 
-  return {
-    name,
-    symbol,
-    decimals,
-    totalSupply,
-    formattedTotalSupply: formatUnits(totalSupply, decimals)
-  };
+    const decimalsNum = Number(decimals);
+    const totalSupplyBigInt = BigInt(totalSupply.toString());
+    const divisor = BigInt(10) ** BigInt(decimalsNum);
+
+    // Formatting total supply
+    const formattedTotalSupply = (Number(totalSupplyBigInt) / Number(divisor)).toString();
+
+    return {
+      name,
+      symbol,
+      decimals: decimalsNum,
+      totalSupply: totalSupplyBigInt,
+      formattedTotalSupply,
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to get TRC20 token info: ${error.message}`);
+  }
 }
 
 /**
- * Get ERC721 token metadata
+ * Get TRC721 token metadata
  */
-export async function getERC721TokenMetadata(
-  tokenAddress: Address,
+export async function getTRC721TokenMetadata(
+  tokenAddress: string,
   tokenId: bigint,
-  network: string = 'ethereum'
+  network: string = "mainnet",
 ): Promise<{
   name: string;
   symbol: string;
   tokenURI: string;
 }> {
-  const publicClient = getPublicClient(network);
+  const tronWeb = getTronWeb(network);
 
-  const contract = getContract({
-    address: tokenAddress,
-    abi: erc721Abi,
-    client: publicClient,
-  });
+  try {
+    const contract = await tronWeb.contract().at(tokenAddress);
 
-  const [name, symbol, tokenURI] = await Promise.all([
-    contract.read.name(),
-    contract.read.symbol(),
-    contract.read.tokenURI([tokenId])
-  ]);
+    const [name, symbol, tokenURI] = await Promise.all([
+      contract.methods.name().call(),
+      contract.methods.symbol().call(),
+      contract.methods.tokenURI(tokenId.toString()).call(),
+    ]);
 
-  return {
-    name,
-    symbol,
-    tokenURI
-  };
+    return {
+      name,
+      symbol,
+      tokenURI,
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to get TRC721 metadata: ${error.message}`);
+  }
 }
 
 /**
- * Get ERC1155 token URI
+ * Get TRC1155 token URI
  */
-export async function getERC1155TokenURI(
-  tokenAddress: Address,
+export async function getTRC1155TokenURI(
+  tokenAddress: string,
   tokenId: bigint,
-  network: string = 'ethereum'
+  network: string = "mainnet",
 ): Promise<string> {
-  const publicClient = getPublicClient(network);
+  const tronWeb = getTronWeb(network);
 
-  const contract = getContract({
-    address: tokenAddress,
-    abi: erc1155Abi,
-    client: publicClient,
-  });
-
-  return contract.read.uri([tokenId]);
-} 
+  try {
+    const contract = await tronWeb.contract().at(tokenAddress);
+    const uri = await contract.methods.uri(tokenId.toString()).call();
+    return uri;
+  } catch (error: any) {
+    throw new Error(`Failed to get TRC1155 URI: ${error.message}`);
+  }
+}

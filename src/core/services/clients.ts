@@ -1,65 +1,56 @@
-import { 
-  createPublicClient, 
-  createWalletClient, 
-  http, 
-  type PublicClient,
-  type WalletClient,
-  type Hex,
-  type Address
-} from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { getChain, getRpcUrl } from '../chains.js';
+import { TronWeb } from "tronweb";
+import { getNetworkConfig } from "../chains.js";
 
 // Cache for clients to avoid recreating them for each request
-const clientCache = new Map<string, PublicClient>();
+const clientCache = new Map<string, TronWeb>();
 
 /**
- * Get a public client for a specific network
+ * Get a TronWeb instance for a specific network
  */
-export function getPublicClient(network = 'ethereum'): PublicClient {
+export function getTronWeb(network = "mainnet"): TronWeb {
   const cacheKey = String(network);
-  
+
   // Return cached client if available
   if (clientCache.has(cacheKey)) {
     return clientCache.get(cacheKey)!;
   }
-  
+
   // Create a new client
-  const chain = getChain(network);
-  const rpcUrl = getRpcUrl(network);
-  
-  const client = createPublicClient({
-    chain,
-    transport: http(rpcUrl)
+  const config = getNetworkConfig(network);
+  const apiKey = process.env.TRONGRID_API_KEY;
+
+  const client = new TronWeb({
+    fullHost: config.fullNode,
+    solidityNode: config.solidityNode,
+    eventServer: config.eventServer,
+    headers: apiKey ? { "TRON-PRO-API-KEY": apiKey } : undefined,
   });
-  
+
+  // Set a default address for read-only calls that might require it
+  client.setAddress("T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb");
+
   // Cache the client
   clientCache.set(cacheKey, client);
-  
+
   return client;
 }
 
 /**
- * Create a wallet client for a specific network and private key
+ * Create a TronWeb instance with a private key for signing
  */
-export function getWalletClient(privateKey: Hex, network = 'ethereum'): WalletClient {
-  const chain = getChain(network);
-  const rpcUrl = getRpcUrl(network);
-  const account = privateKeyToAccount(privateKey);
-  
-  return createWalletClient({
-    account,
-    chain,
-    transport: http(rpcUrl)
+export function getWallet(privateKey: string, network = "mainnet"): TronWeb {
+  const config = getNetworkConfig(network);
+  const apiKey = process.env.TRONGRID_API_KEY;
+
+  // TronWeb expects private key without 0x prefix usually, but handles it if present?
+  // Let's strip 0x to be safe as TronWeb often prefers clean hex
+  const cleanKey = privateKey.startsWith("0x") ? privateKey.slice(2) : privateKey;
+
+  return new TronWeb({
+    fullHost: config.fullNode,
+    solidityNode: config.solidityNode,
+    eventServer: config.eventServer,
+    privateKey: cleanKey,
+    headers: apiKey ? { "TRON-PRO-API-KEY": apiKey } : undefined,
   });
 }
-
-/**
- * Get an Ethereum address from a private key
- * @param privateKey The private key in hex format (with or without 0x prefix)
- * @returns The Ethereum address derived from the private key
- */
-export function getAddressFromPrivateKey(privateKey: Hex): Address {
-  const account = privateKeyToAccount(privateKey);
-  return account.address;
-} 

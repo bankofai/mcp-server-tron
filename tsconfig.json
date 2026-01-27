@@ -8,13 +8,13 @@
     "strict": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
-    "outDir": "dist",
+    "outDir": "build",
     "sourceMap": true,
     "declaration": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true
+    "noEmit": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "build"]
+  "exclude": ["node_modules", "dist", "build", "tests"]
 }

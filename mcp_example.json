@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "tron-mcp-server": {
+      "command": "npx",
+      "args": ["tsx", "src/index.ts"],
+      "env": {
+        "TRON_PRIVATE_KEY": "YOUR_PRIVATE_KEY_HERE"
+      }
+    }
+  }
+}

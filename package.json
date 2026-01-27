@@ -1,5 +1,5 @@
 {
-  "name": "@anthropic/tron-mcp-server",
+  "name": "@sun-protocol/tron-mcp-server",
   "module": "src/index.ts",
   "type": "module",
   "version": "1.0.0",
@@ -15,34 +15,48 @@
     "LICENSE"
   ],
   "scripts": {
-    "start": "bun run src/index.ts",
-    "build": "bun build src/index.ts --outdir build --target node",
-    "build:http": "bun build src/server/http-server.ts --outdir build --target node --outfile http-server.js",
-    "dev": "bun --watch src/index.ts",
-    "start:http": "bun run src/server/http-server.ts",
-    "dev:http": "bun --watch src/server/http-server.ts",
-    "prepublishOnly": "bun run build && bun run build:http",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start:http": "tsx src/server/http-server.ts",
+    "dev:http": "tsx watch src/server/http-server.ts",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepublishOnly": "npm run build",
     "version:patch": "npm version patch",
     "version:minor": "npm version minor",
     "version:major": "npm version major",
     "release": "npm publish",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "changelog:latest": "conventional-changelog -p angular -r 1 > RELEASE_NOTES.md",
-    "inspect": "npx @modelcontextprotocol/inspector node build/index.js"
+    "inspect": "npx @modelcontextprotocol/inspector npx tsx src/index.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.0.0",
-    "conventional-changelog-cli": "^5.0.0"
+    "@types/node": "^22.19.7",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "@typescript-eslint/parser": "^8.53.1",
+    "conventional-changelog-cli": "^5.0.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.1.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.1",
+    "vitest": "^4.0.17"
   },
   "peerDependencies": {
     "typescript": "^5.8.2"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.22.0",
+    "@scure/bip32": "^2.0.1",
+    "@scure/bip39": "^2.0.1",
     "express": "^4.21.2",
-    "tronweb": "^6.0.0",
+    "tronweb": "^6.1.1",
     "zod": "^3.24.3"
   },
   "keywords": [
