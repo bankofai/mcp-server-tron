@@ -18,5 +18,4 @@ All notable changes to this project will be documented in this file.
 
 ### Security
 
-- **Mandatory Confirmation**: Introduced `confirmed` parameter for all write operations (`write_contract`, `transfer_trx`, `transfer_trc20`, `sign_message`). Transactions will not be broadcast without explicit user confirmation.
 - **Environment Variable Safety**: Documentation emphasizing the use of environment variables for private keys instead of MCP configuration files.
