@@ -100,24 +100,33 @@ npm install
 
 ### Environment Variables
 
+**CRITICAL SECURITY NOTE**: For your security, **NEVER** save your private keys or mnemonics directly in the MCP configuration JSON files (like `claude_desktop_config.json` or `mcp.json`). Instead, set them as environment variables in your operating system or shell configuration.
+
 To enable write operations (transfers, contract calls) and ensure reliable API access, you should configure the following variables.
 
 #### Network Configuration
 
-- `TRONGRID_API_KEY`: (Optional) Your TronGrid API key. Highly recommended for Mainnet to avoid frequency limits.
+- `TRONGRID_API_KEY`: (Optional) Your TronGrid API key.
+  - **Why**: TRON mainnet RPCs have strict rate limits. Using an API key from [TronGrid](https://www.trongrid.io/) ensures reliable performance and higher throughput.
+  - **Usage**:
+    ```bash
+    export TRONGRID_API_KEY="<YOUR_TRONGRID_API_KEY_HERE>"
+    ```
 
-#### Wallet Configuration
+#### Wallet Configuration (Use Environment Variables)
 
 **Option 1: Private Key**
 
 ```bash
-export TRON_PRIVATE_KEY="your_private_key_hex" # e.g., 0123... or 0x0123...
+# Recommended: Add this to your ~/.zshrc or ~/.bashrc
+export TRON_PRIVATE_KEY="<YOUR_PRIVATE_KEY_HERE>"
 ```
 
-**Option 2: Mnemonic Phrase (Recommended)**
+**Option 2: Mnemonic Phrase**
 
 ```bash
-export TRON_MNEMONIC="word1 word2 word3 ... word12"
+# Recommended: Add this to your ~/.zshrc or ~/.bashrc
+export TRON_MNEMONIC="<WORD1> <WORD2> ... <WORD12>"
 export TRON_ACCOUNT_INDEX="0" # Optional, default: 0
 ```
 
@@ -153,7 +162,9 @@ npx vitest tests/core/services/services.test.ts # Services integration
 
 ### Connecting from Cursor / Claude Desktop
 
-Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude_desktop_config.json` or `.cursor/mcp.json`):
+Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude_desktop_config.json` or `.cursor/mcp.json`).
+
+**Important**: We recommend omitting the `env` section if you have already set these variables in your system environment. If your MCP client doesn't inherit system variables, use placeholders or ensure the config file is not shared or committed to version control.
 
 **For local development (running from source):**
 
@@ -164,8 +175,8 @@ Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude
       "command": "npx",
       "args": ["tsx", "/ABSOLUTE/PATH/TO/tron-mcp-server/src/index.ts"],
       "env": {
-        "TRON_PRIVATE_KEY": "your_private_key_hex",
-        "TRONGRID_API_KEY": "your_trongrid_api_key"
+        "TRON_PRIVATE_KEY": "<YOUR_PRIVATE_KEY_HERE>",
+        "TRONGRID_API_KEY": "<YOUR_TRONGRID_API_KEY_HERE>"
       }
     }
   }
@@ -181,8 +192,8 @@ Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude
       "command": "npx",
       "args": ["-y", "@sun-protocol/tron-mcp-server"],
       "env": {
-        "TRON_PRIVATE_KEY": "your_private_key_hex",
-        "TRONGRID_API_KEY": "your_trongrid_api_key"
+        "TRON_PRIVATE_KEY": "<YOUR_PRIVATE_KEY_HERE>",
+        "TRONGRID_API_KEY": "<YOUR_TRONGRID_API_KEY_HERE>"
       }
     }
   }
@@ -240,9 +251,10 @@ Add the following to your MCP configuration file (e.g., `~/.config/Claude/claude
 
 ## Security Considerations
 
-- **Private Keys**: Never share your private keys. Use environment variables.
+- **Private Keys & Mnemonics**: **NEVER** save your sensitive wallet information in plain text configuration files (like `mcp.json`). These files are often unencrypted and can be accidentally shared or committed to git. Use system environment variables which are more secure.
+- **Exposure**: If you are using a shared machine, be aware that environment variables might be visible to other users.
 - **Testnets**: Always test on Nile or Shasta before performing operations on Mainnet.
-- **Approvals**: Be cautious when approving token allowances via `write_contract`.
+- **Approvals**: Be cautious when approving token allowances via `write_contract`. Only approve what is necessary.
 
 ## Project Structure
 
