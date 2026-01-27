@@ -90,6 +90,135 @@ ${
   );
 
   server.registerPrompt(
+    "interact_with_contract",
+    {
+      description:
+        "Safely execute write operations on a smart contract with validation and confirmation",
+      argsSchema: {
+        contractAddress: z.string().describe("Contract address to interact with"),
+        functionName: z.string().describe("Function to call (e.g., 'mint', 'swap', 'stake')"),
+        args: z.string().optional().describe("Comma-separated function arguments"),
+        value: z.string().optional().describe("TRX value to send (for payable functions)"),
+        network: z.string().optional().describe("Network name (default: mainnet)"),
+      },
+    },
+    ({ contractAddress, functionName, args, value, network = "mainnet" }) => {
+      const argsList = args ? args.split(",").map((a) => a.trim()) : [];
+      return {
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: `# Smart Contract Interaction
+
+**Objective**: Safely execute ${functionName} on contract ${contractAddress} on ${network}
+
+## Prerequisites Check
+
+### 1. Wallet Verification
+- Call \`get_wallet_address\` to confirm the wallet that will execute this transaction
+- Verify this is the correct wallet for this operation
+
+### 2. Contract Analysis
+- Use \`read_contract\` or external knowledge to understand the function parameters
+- Check function type:
+  * **View/Pure**: Read-only (use \`read_contract\` instead)
+  * **Nonpayable**: State-changing, no TRX required
+  * **Payable**: State-changing, can accept TRX
+
+### 3. Function Parameter Validation
+For function: **${functionName}**
+${argsList.length > 0 ? `Arguments provided: ${argsList.join(", ")}` : "No arguments provided"}
+
+- Verify parameter types match the contract requirements
+- Validate addresses are correct (Base58 or Hex)
+- Check numeric values are in correct units
+
+### 4. Pre-execution Checks
+
+**Balance Check**:
+- Call \`get_balance\` to verify sufficient TRX balance
+- Account for Energy/Bandwidth costs + value (if payable)
+
+**Resource Estimation**:
+- Call \`get_chain_parameters\` to check current unit prices
+- Estimate Energy and Bandwidth usage
+
+## Execution Process
+
+### 1. Present Summary to User
+Before executing, show:
+- **Contract**: ${contractAddress}
+- **Network**: ${network}
+- **Function**: ${functionName}
+- **Arguments**: ${argsList.length > 0 ? argsList.join(", ") : "None"}
+${value ? `- **Value**: ${value} TRX` : ""}
+- **From**: [wallet address from step 1]
+- **Estimated Resource Cost**: [Energy / Bandwidth estimation]
+
+### 2. Request User Confirmation
+⚠️ **IMPORTANT**: Always ask user to confirm before executing write operations
+- Clearly state what will happen
+- Show all costs involved
+- Explain any risks or irreversible actions
+
+### 3. Execute Transaction
+Only after user confirms:
+\`\`\`
+Call write_contract with:
+- contractAddress: "${contractAddress}"
+- functionName: "${functionName}"
+${argsList.length > 0 ? `- args: ${JSON.stringify(argsList)}` : ""}
+${value ? `- value: "${value}"` : ""}
+- network: "${network}"
+\`\`\`
+
+### 4. Monitor Transaction
+After execution:
+1. Return transaction hash to user
+2. Call \`get_transaction_info\` to verify success
+3. If failed, call \`diagnose_transaction\` to understand why
+
+## Output Format
+
+**Pre-Execution Summary**:
+- Contract details
+- Function and parameters
+- Cost breakdown
+- Risk assessment
+
+**Confirmation Request**:
+"Ready to execute ${functionName} on ${contractAddress}. Proceed? (yes/no)"
+
+**Execution Result**:
+- Transaction Hash: [hash]
+- Status: Pending/Confirmed/Failed
+- Energy Used: [actual energy used]
+- Bandwidth Used: [actual bandwidth used]
+
+## Safety Considerations
+
+### Critical Checks
+- ✅ Check function parameters are correct type and format
+- ✅ Ensure sufficient balance for fees + value
+- ✅ Validate addresses (no typos, correct network)
+- ✅ Understand what the function does before calling
+
+### Common Risks
+- **Irreversible**: Most blockchain transactions cannot be undone
+- **Fee Loss**: Failed transactions still consume Energy/Bandwidth
+- **Approval Risks**: Be careful with unlimited approvals
+- **Access Control**: Verify you have permission to call this function
+`,
+            },
+          },
+        ],
+      };
+    },
+  );
+
+  server.registerPrompt(
     "diagnose_transaction",
     {
       description: "Analyze transaction status, failures, and provide debugging insights",
@@ -146,6 +275,90 @@ Provide structured diagnosis:
 - **Resource Usage**: Energy / Bandwidth used
 - **Issue (if failed)**: Root cause and explanation
 - **Recommended Actions**: Next steps to resolve
+`,
+          },
+        },
+      ],
+    }),
+  );
+
+  server.registerPrompt(
+    "explain_tron_concept",
+    {
+      description: "Explain TRON and blockchain concepts with examples",
+      argsSchema: {
+        concept: z
+          .string()
+          .describe(
+            "Concept to explain (Energy, Bandwidth, Super Representative, TRC20, TRC721, etc)",
+          ),
+      },
+    },
+    ({ concept }) => ({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `# Concept Explanation: ${concept}
+
+**Objective**: Provide clear, practical explanation of "${concept}"
+
+## Explanation Structure
+
+### 1. Definition
+- What is it?
+- Simple one-sentence summary
+- Technical name/terminology
+
+### 2. How It Works
+- Step-by-step explanation
+- Why it exists/why it's important (e.g., Resource model prevents spam)
+- How it relates to TRON blockchain
+
+### 3. Real-World Analogy
+- Compare to familiar concept (e.g., Bandwidth like internet data, Energy like CPU time)
+- Make it relatable for beginners
+- Highlight key differences
+
+### 4. Practical Examples
+- Real transaction scenarios
+- Numbers and metrics where applicable (e.g., Transfer costs ~300 Bandwidth)
+- Common scenarios
+- Edge cases or gotchas
+
+### 5. Relevance to Users
+- Why should developers/users care?
+- How does it affect transactions/costs?
+- How to optimize (e.g., Staking for resources)?
+- Common mistakes to avoid
+
+## Output Format
+
+Provide explanation in sections:
+
+**What is ${concept}?**
+[Definition and overview]
+
+**How Does It Work?**
+[Mechanics and process]
+
+**Example**
+[Real or hypothetical scenario]
+
+**Key Takeaways**
+[Bullet points of important facts]
+
+**Common Questions**
+- Question 1? Answer
+- Question 2? Answer
+
+## Important
+- Use clear, non-technical language first
+- Progress to technical details
+- Include concrete numbers where helpful
+- Be honest about complexity
+- Suggest further learning if needed
 `,
           },
         },
