@@ -172,6 +172,7 @@ To use this server with MCP clients like Claude Desktop, Cursor, or Google Antig
 |                        | Windows | `%APPDATA%\Claude\claude_desktop_config.json`                     |
 | **Cursor**             | All     | Project root: `.cursor/mcp.json`                                  |
 | **Google Antigravity** | All     | `~/.config/antigravity/mcp.json`                                  |
+| **Opencode**           | All     | `~/.config/opencode/mcp.json`                                     |
 
 #### 2. Add Server Definition
 
