@@ -4,7 +4,7 @@
   "module": "src/index.ts",
   "type": "module",
   "version": "1.1.1",
-  "description": "MCP server for interacting with TRON blockchain - supports tools and prompts for TRX, TRC20, TRC721 tokens and smart contracts",
+  "description": "MCP server for TRON blockchain. Supports TRX/TRC20 transfers, smart contracts, and AI prompts.",
   "bin": {
     "tron-mcp-server": "./bin/cli.js"
   },
