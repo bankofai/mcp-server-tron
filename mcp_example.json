@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "tron-mcp-server": {
+    "mcp-server-tron": {
       "command": "npx",
       "args": ["tsx", "src/index.ts"],
       "env": {

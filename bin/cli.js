@@ -13,7 +13,7 @@ const require = createRequire(import.meta.url);
 const args = process.argv.slice(2);
 const httpMode = args.includes("--http") || args.includes("-h");
 
-console.error(`Starting TRON MCP Server in ${httpMode ? "HTTP" : "stdio"} mode...`);
+console.error(`Starting mcp-server-tron in ${httpMode ? "HTTP" : "stdio"} mode...`);
 
 // Determine which file to execute
 const scriptPath = resolve(__dirname, "../build", httpMode ? "server/http-server.js" : "index.js");
