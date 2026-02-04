@@ -1,12 +1,12 @@
 {
   "mcpServers": {
-    "tron-mcp-server": {
+    "mcp-server-tron": {
       "command": "npx",
-      "args": ["-y", "@sun-protocol/tron-mcp-server"]
+      "args": ["-y", "@open-aibank/mcp-server-tron"]
     },
     "tron-mcp-http": {
       "command": "npx",
-      "args": ["-y", "@sun-protocol/tron-mcp-server", "--http"]
+      "args": ["-y", "@open-aibank/mcp-server-tron", "--http"]
     }
   }
 }

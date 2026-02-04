@@ -1,4 +1,4 @@
-# TRON MCP Server
+# MCP Server Tron
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![TRON Network](https://img.shields.io/badge/Network-TRON-red)
@@ -89,8 +89,8 @@ Key capabilities:
 
 ```bash
 # Clone the repository
-git clone https://github.com/sun-protocol/tron-mcp-server.git
-cd tron-mcp-server
+git clone https://github.com/open-aibank/mcp-server-tron.git
+cd mcp-server-tron
 
 # Install dependencies
 npm install
@@ -184,9 +184,9 @@ Runs the latest version directly from npm.
 ```json
 {
   "mcpServers": {
-    "tron-mcp-server": {
+    "mcp-server-tron": {
       "command": "npx",
-      "args": ["-y", "@sun-protocol/tron-mcp-server"],
+      "args": ["-y", "@open-aibank/mcp-server-tron"],
       "env": {
         "TRON_PRIVATE_KEY": "YOUR_KEY_HERE (Or set in system env)",
         "TRONGRID_API_KEY": "YOUR_KEY_HERE (Or set in system env)"
@@ -202,9 +202,9 @@ For developers running from the cloned repository.
 ```json
 {
   "mcpServers": {
-    "tron-mcp-server": {
+    "mcp-server-tron": {
       "command": "npx",
-      "args": ["tsx", "/ABSOLUTE/PATH/TO/tron-mcp-server/src/index.ts"],
+      "args": ["tsx", "/ABSOLUTE/PATH/TO/mcp-server-tron/src/index.ts"],
       "env": {
         "TRON_PRIVATE_KEY": "YOUR_KEY_HERE (Or set in system env)",
         "TRONGRID_API_KEY": "YOUR_KEY_HERE (Or set in system env)"
@@ -289,7 +289,7 @@ For developers running from the cloned repository.
 ## Project Structure
 
 ```
-tron-mcp-server/
+mcp-server-tron/
 ├── src/
 │   ├── core/
 │   │   ├── chains.ts           # Network definitions

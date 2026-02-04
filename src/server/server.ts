@@ -10,8 +10,8 @@ async function startServer() {
     // Create a new MCP server instance with capabilities
     const server = new McpServer(
       {
-        name: "tron-mcp-server",
-        version: "2.0.0",
+        name: "mcp-server-tron",
+        version: "1.1.1",
       },
       {
         capabilities: {
@@ -36,7 +36,7 @@ async function startServer() {
     registerTRONPrompts(server);
 
     // Log server information
-    console.error(`TRON MCP Server v2.0.0 initialized`);
+    console.error(`mcp-server-tron v1.1.1 initialized`);
     console.error(`Protocol: MCP 2025-06-18`);
     console.error(`Supported networks: ${getSupportedNetworks().length} networks`);
     console.error("Server is ready to handle requests");

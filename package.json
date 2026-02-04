@@ -1,12 +1,12 @@
 {
-  "name": "@sun-protocol/tron-mcp-server",
-  "mcpName": "io.github.sun-protocol/tron-mcp-server",
+  "name": "@open-aibank/mcp-server-tron",
+  "mcpName": "io.github.open-aibank/mcp-server-tron",
   "module": "src/index.ts",
   "type": "module",
   "version": "1.1.1",
   "description": "MCP server for TRON blockchain. Supports TRX/TRC20 transfers, smart contracts, and AI prompts.",
   "bin": {
-    "tron-mcp-server": "./bin/cli.js"
+    "mcp-server-tron": "./bin/cli.js"
   },
   "main": "build/index.js",
   "files": [
@@ -79,12 +79,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sun-protocol/tron-mcp-server"
+    "url": "https://github.com/open-aibank/mcp-server-tron"
   },
   "bugs": {
-    "url": "https://github.com/sun-protocol/tron-mcp-server/issues"
+    "url": "https://github.com/open-aibank/mcp-server-tron/issues"
   },
-  "homepage": "https://github.com/sun-protocol/tron-mcp-server#readme",
+  "homepage": "https://github.com/open-aibank/mcp-server-tron#readme",
   "publishConfig": {
     "access": "public"
   }
