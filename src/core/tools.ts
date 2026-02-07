@@ -546,9 +546,14 @@ export function registerTRONTools(server: McpServer) {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name (e.g., 'name', 'symbol', 'balanceOf')"),
         args: z
-          .array(z.union([z.string(), z.number(), z.boolean()]))
+          .array(z.union([
+            z.string(), 
+            z.number(), 
+            z.boolean(),
+            z.array(z.string())  // 支持字符串数组（如地址数组）
+          ]))
           .optional()
-          .describe("Function arguments"),
+          .describe("Function arguments (supports string arrays for address[] parameters)"),
         network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
@@ -608,9 +613,14 @@ export function registerTRONTools(server: McpServer) {
               address: z.string().describe("Target contract address"),
               functionName: z.string().describe("Function name"),
               args: z
-                .array(z.union([z.string(), z.number(), z.boolean()]))
+                .array(z.union([
+                  z.string(), 
+                  z.number(), 
+                  z.boolean(),
+                  z.array(z.string())  // 支持字符串数组
+                ]))
                 .optional()
-                .describe("Function arguments"),
+                .describe("Function arguments (supports string arrays for address[] parameters)"),
               abi: z
                 .array(z.object({}).passthrough())
                 .describe("Function ABI (required for multicall)"),
@@ -697,9 +707,14 @@ export function registerTRONTools(server: McpServer) {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name to call"),
         args: z
-          .array(z.union([z.string(), z.number(), z.boolean()]))
+          .array(z.union([
+            z.string(), 
+            z.number(), 
+            z.boolean(),
+            z.array(z.string())  // 支持字符串数组
+          ]))
           .optional()
-          .describe("Function arguments"),
+          .describe("Function arguments (supports string arrays for address[] parameters)"),
         value: z.string().optional().describe("TRX value to send (in Sun)"),
         network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
