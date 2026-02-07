@@ -550,10 +550,16 @@ export function registerTRONTools(server: McpServer) {
             z.string(), 
             z.number(), 
             z.boolean(),
-            z.array(z.string())  // 支持字符串数组（如地址数组）
+            z.array(z.string()),  // 字符串数组
+            z.array(z.number()),  // 数字数组
+            z.record(z.unknown()) // 对象（tuple）
           ]))
           .optional()
-          .describe("Function arguments (supports string arrays for address[] parameters)"),
+          .describe("Function arguments (supports arrays and objects for complex types)"),
+        abi: z
+          .array(z.record(z.unknown()))
+          .optional()
+          .describe("Optional contract ABI array. If not provided, will fetch from chain. Use for contracts with incomplete on-chain ABI."),
         network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
@@ -564,13 +570,14 @@ export function registerTRONTools(server: McpServer) {
         openWorldHint: true,
       },
     },
-    async ({ contractAddress, functionName, args = [], network = "mainnet" }) => {
+    async ({ contractAddress, functionName, args = [], abi, network = "mainnet" }) => {
       try {
         const result = await services.readContract(
           {
             address: contractAddress,
             functionName,
             args,
+            abi,
           },
           network,
         );
@@ -617,12 +624,14 @@ export function registerTRONTools(server: McpServer) {
                   z.string(), 
                   z.number(), 
                   z.boolean(),
-                  z.array(z.string())  // 支持字符串数组
+                  z.array(z.string()),  // 字符串数组
+                  z.array(z.number()),  // 数字数组
+                  z.record(z.unknown()) // 对象（tuple）
                 ]))
                 .optional()
-                .describe("Function arguments (supports string arrays for address[] parameters)"),
+                .describe("Function arguments (supports arrays and objects for complex types)"),
               abi: z
-                .array(z.object({}).passthrough())
+                .array(z.record(z.unknown()))
                 .describe("Function ABI (required for multicall)"),
               allowFailure: z
                 .boolean()
@@ -711,10 +720,16 @@ export function registerTRONTools(server: McpServer) {
             z.string(), 
             z.number(), 
             z.boolean(),
-            z.array(z.string())  // 支持字符串数组
+            z.array(z.string()),  // 字符串数组
+            z.array(z.number()),  // 数字数组
+            z.record(z.unknown()) // 对象（tuple）
           ]))
           .optional()
-          .describe("Function arguments (supports string arrays for address[] parameters)"),
+          .describe("Function arguments (supports arrays and objects for complex types)"),
+        abi: z
+          .array(z.record(z.unknown()))
+          .optional()
+          .describe("Optional contract ABI array. If not provided, will fetch from chain. Use for contracts with incomplete on-chain ABI."),
         value: z.string().optional().describe("TRX value to send (in Sun)"),
         network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
@@ -726,7 +741,7 @@ export function registerTRONTools(server: McpServer) {
         openWorldHint: true,
       },
     },
-    async ({ contractAddress, functionName, args = [], value, network = "mainnet" }) => {
+    async ({ contractAddress, functionName, args = [], abi, value, network = "mainnet" }) => {
       try {
         const privateKey = getConfiguredPrivateKey();
         const senderAddress = getWalletAddressFromKey();
@@ -737,6 +752,7 @@ export function registerTRONTools(server: McpServer) {
             address: contractAddress,
             functionName,
             args,
+            abi,
             value,
           },
           network,
