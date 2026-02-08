@@ -550,9 +550,9 @@ export function registerTRONTools(server: McpServer) {
             z.string(), 
             z.number(), 
             z.boolean(),
-            z.array(z.string()),  // 字符串数组
-            z.array(z.number()),  // 数字数组
-            z.record(z.unknown()) // 对象（tuple）
+            z.array(z.string()),  // String array
+            z.array(z.number()),  // Number array
+            z.record(z.unknown()) // Object (tuple)
           ]))
           .optional()
           .describe("Function arguments (supports arrays and objects for complex types)"),
@@ -624,9 +624,9 @@ export function registerTRONTools(server: McpServer) {
                   z.string(), 
                   z.number(), 
                   z.boolean(),
-                  z.array(z.string()),  // 字符串数组
-                  z.array(z.number()),  // 数字数组
-                  z.record(z.unknown()) // 对象（tuple）
+                  z.array(z.string()),  // String array
+                  z.array(z.number()),  // Number array
+                  z.record(z.unknown()) // Object (tuple)
                 ]))
                 .optional()
                 .describe("Function arguments (supports arrays and objects for complex types)"),
@@ -720,9 +720,9 @@ export function registerTRONTools(server: McpServer) {
             z.string(), 
             z.number(), 
             z.boolean(),
-            z.array(z.string()),  // 字符串数组
-            z.array(z.number()),  // 数字数组
-            z.record(z.unknown()) // 对象（tuple）
+            z.array(z.string()),  // String array
+            z.array(z.number()),  // Number array
+            z.record(z.unknown()) // Object (tuple)
           ]))
           .optional()
           .describe("Function arguments (supports arrays and objects for complex types)"),
