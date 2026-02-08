@@ -546,20 +546,24 @@ export function registerTRONTools(server: McpServer) {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name (e.g., 'name', 'symbol', 'balanceOf')"),
         args: z
-          .array(z.union([
-            z.string(), 
-            z.number(), 
-            z.boolean(),
-            z.array(z.string()),  // String array
-            z.array(z.number()),  // Number array
-            z.record(z.unknown()) // Object (tuple)
-          ]))
+          .array(
+            z.union([
+              z.string(),
+              z.number(),
+              z.boolean(),
+              z.array(z.string()), // String array
+              z.array(z.number()), // Number array
+              z.record(z.unknown()), // Object (tuple)
+            ]),
+          )
           .optional()
           .describe("Function arguments (supports arrays and objects for complex types)"),
         abi: z
           .array(z.record(z.unknown()))
           .optional()
-          .describe("Optional contract ABI array. If not provided, will fetch from chain. Use for contracts with incomplete on-chain ABI."),
+          .describe(
+            "Optional contract ABI array. If not provided, will fetch from chain. Use for contracts with incomplete on-chain ABI.",
+          ),
         network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
       annotations: {
@@ -620,19 +624,19 @@ export function registerTRONTools(server: McpServer) {
               address: z.string().describe("Target contract address"),
               functionName: z.string().describe("Function name"),
               args: z
-                .array(z.union([
-                  z.string(), 
-                  z.number(), 
-                  z.boolean(),
-                  z.array(z.string()),  // String array
-                  z.array(z.number()),  // Number array
-                  z.record(z.unknown()) // Object (tuple)
-                ]))
+                .array(
+                  z.union([
+                    z.string(),
+                    z.number(),
+                    z.boolean(),
+                    z.array(z.string()), // String array
+                    z.array(z.number()), // Number array
+                    z.record(z.unknown()), // Object (tuple)
+                  ]),
+                )
                 .optional()
                 .describe("Function arguments (supports arrays and objects for complex types)"),
-              abi: z
-                .array(z.record(z.unknown()))
-                .describe("Function ABI (required for multicall)"),
+              abi: z.array(z.record(z.unknown())).describe("Function ABI (required for multicall)"),
               allowFailure: z
                 .boolean()
                 .optional()
@@ -716,20 +720,24 @@ export function registerTRONTools(server: McpServer) {
         contractAddress: z.string().describe("The contract address"),
         functionName: z.string().describe("Function name to call"),
         args: z
-          .array(z.union([
-            z.string(), 
-            z.number(), 
-            z.boolean(),
-            z.array(z.string()),  // String array
-            z.array(z.number()),  // Number array
-            z.record(z.unknown()) // Object (tuple)
-          ]))
+          .array(
+            z.union([
+              z.string(),
+              z.number(),
+              z.boolean(),
+              z.array(z.string()), // String array
+              z.array(z.number()), // Number array
+              z.record(z.unknown()), // Object (tuple)
+            ]),
+          )
           .optional()
           .describe("Function arguments (supports arrays and objects for complex types)"),
         abi: z
           .array(z.record(z.unknown()))
           .optional()
-          .describe("Optional contract ABI array. If not provided, will fetch from chain. Use for contracts with incomplete on-chain ABI."),
+          .describe(
+            "Optional contract ABI array. If not provided, will fetch from chain. Use for contracts with incomplete on-chain ABI.",
+          ),
         value: z.string().optional().describe("TRX value to send (in Sun)"),
         network: z.string().optional().describe("Network name. Defaults to mainnet."),
       },
