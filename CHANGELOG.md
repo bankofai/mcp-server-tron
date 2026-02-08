@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] - 2026-02-08
+
+### Changed
+
+- Support array parameters in contract calls.
+- Support passing ABI in contract calls.
+
 ## [1.1.1] - 2026-01-27
 
 ### Changed
