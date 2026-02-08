@@ -1,6 +1,6 @@
 {
-  "name": "@open-aibank/mcp-server-tron",
-  "mcpName": "io.github.open-aibank/mcp-server-tron",
+  "name": "@bankofai/mcp-server-tron",
+  "mcpName": "io.github.bankofai/mcp-server-tron",
   "module": "src/index.ts",
   "type": "module",
   "version": "1.1.1",
@@ -72,19 +72,19 @@
     "trc20",
     "trc721"
   ],
-  "author": "vcart <info@mcp.direct>",
+  "author": "bankofai <support@bankofai.io>",
   "license": "MIT",
   "engines": {
     "node": ">=20.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-aibank/mcp-server-tron"
+    "url": "https://github.com/bankofai/mcp-server-tron"
   },
   "bugs": {
-    "url": "https://github.com/open-aibank/mcp-server-tron/issues"
+    "url": "https://github.com/bankofai/mcp-server-tron/issues"
   },
-  "homepage": "https://github.com/open-aibank/mcp-server-tron#readme",
+  "homepage": "https://github.com/bankofai/mcp-server-tron#readme",
   "publishConfig": {
     "access": "public"
   }

@@ -89,7 +89,7 @@ Key capabilities:
 
 ```bash
 # Clone the repository
-git clone https://github.com/open-aibank/mcp-server-tron.git
+git clone https://github.com/bankofai/mcp-server-tron.git
 cd mcp-server-tron
 
 # Install dependencies
@@ -186,7 +186,7 @@ Runs the latest version directly from npm.
   "mcpServers": {
     "mcp-server-tron": {
       "command": "npx",
-      "args": ["-y", "@open-aibank/mcp-server-tron"],
+      "args": ["-y", "@bankofai/mcp-server-tron"],
       "env": {
         "TRON_PRIVATE_KEY": "YOUR_KEY_HERE (Or set in system env)",
         "TRONGRID_API_KEY": "YOUR_KEY_HERE (Or set in system env)"
