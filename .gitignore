@@ -28,7 +28,6 @@ mcp-context/
 build/
 
 # Package Lock & Release Notes
-package-lock.json
 RELEASE_NOTES.md
 
 # Finder (MacOS) folder config
